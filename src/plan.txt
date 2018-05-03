@@ -1,0 +1,10 @@
+* Keep structure and member names the same during the initial port,
+  it makes it easier to refer back to the original code and port
+  piece-by-piece.
+* Embed Cargo version number into the exe.
+* Embed Git sha and branch into the exe.
+
+
+
+Sass_Context is the C context,    it is defined in src/sass_context.hpp
+Sass::Context is the C++ context, it is defined in src/context.hpp
