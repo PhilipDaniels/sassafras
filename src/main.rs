@@ -3,9 +3,11 @@ extern crate built;
 extern crate clap;
 #[macro_use]
 extern crate structopt;
+extern crate sassafras;
 
 use structopt::StructOpt;
 use std::path::PathBuf;
+use sassafras::sass_make_options;
 
 // TODO: Both of these enums cause a warning to be emitted.
 
@@ -88,6 +90,5 @@ fn main() {
     // sassc uses the C API to drive libsass.
     // For the sake of testing and porting, we will do the same for now,
     // so this is not idiomatic Rust.
-
+    let mut options = sass_make_options();
 }
-
