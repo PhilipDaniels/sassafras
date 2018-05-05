@@ -1,94 +1,9 @@
-use std::path::PathBuf;
-
-// FROM: include/sass/base.h
-// Different render styles
-#[derive(Debug)]
-pub enum Sass_Output_Style {
-    SASS_STYLE_NESTED,
-    SASS_STYLE_EXPANDED,
-    SASS_STYLE_COMPACT,
-    SASS_STYLE_COMPRESSED,
-    // only used internaly
-    SASS_STYLE_INSPECT,
-    SASS_STYLE_TO_SASS
-}
-
-impl Default for Sass_Output_Style {
-    fn default() -> Self {
-        Sass_Output_Style::SASS_STYLE_NESTED
-    }
-}
-
-// FROM: stc/sass.hpp
-// input behaviours
-#[derive(Debug)]
-pub enum Sass_Input_Style {
-    SASS_CONTEXT_NULL,
-    SASS_CONTEXT_FILE,
-    SASS_CONTEXT_DATA,
-    SASS_CONTEXT_FOLDER
-}
-
-// FROM: src/sass.hpp
-// sass config options structure
-#[derive(Default, Debug)]
-pub struct Sass_Inspect_Options {
-    // Output style for the generated css code
-    output_style: Sass_Output_Style,
-
-    // Precision for fractional numbers
-    precision: i32
-}
-
-impl Sass_Inspect_Options {
-    // Defaults = Nested, 5.
-    pub fn new(style: Sass_Output_Style, precision: i32) -> Self {
-        Sass_Inspect_Options { output_style: style, precision }
-    }
-}
-
-// FROM: src/sass.hpp
-#[derive(Default, Debug)]
-pub struct Sass_Output_Options {
-    inspect_options: Sass_Inspect_Options,
-    // String to be used for indentation
-    indent: String,
-    // String to be used to for line feeds
-    linefeed: String,
-    // Emit comments in the generated CSS indicating
-    // the corresponding source line.
-    source_comments: bool
-}
-
-// FROM: src/sass.hpp
-// sass config options structure
-impl Sass_Output_Options {
-    // Defaults: indent = two spaces, linefeed = '\n', source_comments = false
-    pub fn new_from_options<S>(opt: Sass_Inspect_Options, indent: S, linefeed: S, source_comments: bool) -> Self
-        where S: Into<String>
-    {
-        Sass_Output_Options {
-            inspect_options: opt,
-            indent: indent.into(),
-            linefeed: linefeed.into(),
-            source_comments
-        }
-    }
-
-    // Defaults: indent = two spaces, linefeed = '\n', source_comments = false
-    pub fn new<S>(style: Sass_Output_Style, precision: i32, indent: S, linefeed: S, source_comments: bool) -> Self
-        where S: Into<String>
-    {
-        Sass_Output_Options {
-            inspect_options: Sass_Inspect_Options::new(style, precision),
-            indent: indent.into(),
-            linefeed: linefeed.into(),
-            source_comments
-        }
-    }
-}
-
 // FROM: src/sass_context.hpp
+
+
+use std::path::PathBuf;
+use super::*;
+
 // sass config options structure
 #[derive(Default, Debug)]
 pub struct Sass_Options {
@@ -165,7 +80,6 @@ impl Sass_Options {
     }
 }
 
-// FROM: src/sass_context.hpp
 // base for all contexts
 struct Sass_Context {
     options: Sass_Options,
@@ -192,7 +106,6 @@ struct Sass_Context {
     included_files: Vec<PathBuf>
 }
 
-// FROM: src/sass_context.hpp
 // struct for file compilation
 pub struct Sass_File_Context {
     context: Sass_Context
@@ -200,7 +113,6 @@ pub struct Sass_File_Context {
     // input_path is already on options
 }
 
-// FROM: src/sass_context.hpp
 // struct for data compilation
 pub struct Sass_Data_Context {
     context: Sass_Context,
@@ -208,15 +120,6 @@ pub struct Sass_Data_Context {
     srcmap_string: String
 }
 
-// FROM: include/sass/context.h
-// Compiler states
-pub enum Sass_Compiler_State {
-    SASS_COMPILER_CREATED,
-    SASS_COMPILER_PARSED,
-    SASS_COMPILER_EXECUTED
-}
-
-// FROM: src/sass_context.hpp
 // link c and cpp context
 pub struct Sass_Compiler {
     // progress status
@@ -236,7 +139,6 @@ pub fn sass_make_options() -> Sass_Options {
     options
 }
 
-// FROM: src/sass_context.cpp (done with a macro).
 // Create getter and setters for options
 pub fn sass_option_set_precision(options: &mut Sass_Options, precision: i32) {
     options.output_options.inspect_options.precision = precision;
@@ -247,5 +149,5 @@ pub fn sass_option_set_output_style(options: &mut Sass_Options, output_style: Sa
 }
 
 pub fn sass_option_push_import_extension(options: &mut Sass_Options, ext: String) {
-
+    options.extensions.push(ext);
 }

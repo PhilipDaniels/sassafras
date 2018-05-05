@@ -1,3 +1,5 @@
+#[allow(non_camel_case_types)]
+
 extern crate built;
 #[macro_use]
 extern crate clap;
