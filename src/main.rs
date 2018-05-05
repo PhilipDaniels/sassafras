@@ -7,7 +7,7 @@ extern crate sassafras;
 
 use structopt::StructOpt;
 use std::path::PathBuf;
-use sassafras::sass_make_options;
+use sassafras::c_api;
 
 // TODO: Both of these enums cause a warning to be emitted.
 
@@ -90,5 +90,13 @@ fn main() {
     // sassc uses the C API to drive libsass.
     // For the sake of testing and porting, we will do the same for now,
     // so this is not idiomatic Rust.
-    let mut options = sass_make_options();
+    let mut options = c_api::sass_make_options();
+    c_api::sass_option_set_output_style(&mut options, c_api::Sass_Output_Style::SASS_STYLE_NESTED);
+    c_api::sass_option_set_precision(&mut options, 5);
+
+    if let Some(ext) = args.import_extension {
+        c_api::sass_option_push_import_extension(&mut options, ext);
+    }
+
+    println!("{:#?}", options);
 }

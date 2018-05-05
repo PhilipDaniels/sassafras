@@ -1,7 +1,4 @@
-
-pub fn sass_make_options() -> bool {
-    true
-}
+pub mod c_api;
 
 #[cfg(test)]
 mod tests {
