@@ -46,7 +46,7 @@ pub struct Sass_Options {
     plugin_path: PathBuf,
 
     // Extensions (linked string list)
-    extensions: Vec<String>,
+    extensions: Vec<PathBuf>,
 
     // Include paths (linked string list)
     include_paths: Vec<String>,
@@ -148,6 +148,6 @@ pub fn sass_option_set_output_style(options: &mut Sass_Options, output_style: Sa
     options.output_options.inspect_options.output_style = output_style;
 }
 
-pub fn sass_option_push_import_extension(options: &mut Sass_Options, ext: String) {
+pub fn sass_option_push_import_extension(options: &mut Sass_Options, ext: PathBuf) {
     options.extensions.push(ext);
 }

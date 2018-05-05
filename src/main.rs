@@ -57,8 +57,8 @@ struct Arguments {
     plugin_path: Option<PathBuf>,
 
     /// Set additional extensions to use when resolving imports.
-    #[structopt(short = "E", long = "import-extension")]
-    import_extension: Option<String>,
+    #[structopt(short = "E", long = "import-extension", parse(from_os_str))]
+    import_extension: Option<PathBuf>,
 
     /// Emit source map.
     #[structopt(short = "m", long = "sourcemap", default_value = "no", raw(possible_values = "&SourceMapEmission::variants()", case_insensitive = "true"))]
