@@ -49,10 +49,10 @@ pub struct Sass_Options {
     extensions: Vec<PathBuf>,
 
     // Include paths (linked string list)
-    include_paths: Vec<String>,
+    include_paths: Vec<PathBuf>,
 
     // Plugin paths (linked string list)
-    plugin_paths: Vec<String>,
+    plugin_paths: Vec<PathBuf>,
 
     // Path to source map file
     // Enables source map generation
@@ -140,7 +140,7 @@ pub fn sass_make_options() -> Sass_Options {
 }
 
 // Create getter and setters for options
-pub fn sass_option_set_precision(options: &mut Sass_Options, precision: i32) {
+pub fn sass_option_set_precision(options: &mut Sass_Options, precision: u8) {
     options.output_options.inspect_options.precision = precision;
 }
 
@@ -149,5 +149,39 @@ pub fn sass_option_set_output_style(options: &mut Sass_Options, output_style: Sa
 }
 
 pub fn sass_option_push_import_extension(options: &mut Sass_Options, ext: PathBuf) {
+    // TODO: These methods that push to these vectors should check for existence and not push if already there.
     options.extensions.push(ext);
+}
+
+// TODO: Use Into<PathBuf>? Is this same for a C API?
+pub fn sass_option_push_include_path(options: &mut Sass_Options, path: PathBuf) {
+    options.include_paths.push(path);
+}
+
+pub fn sass_option_push_plugin_path(options: &mut Sass_Options, path: PathBuf) {
+    options.plugin_paths.push(path);
+}
+
+pub fn sass_option_set_source_comments(options: &mut Sass_Options, source_comments: bool) {
+    options.output_options.source_comments = source_comments;
+}
+
+pub fn sass_option_set_omit_source_map_url(options: &mut Sass_Options, omit_source_map_url: bool) {
+    options.omit_source_map_url = omit_source_map_url;
+}
+
+pub fn sass_option_set_is_indented_syntax_src(options: &mut Sass_Options, is_indented_syntax_src: bool) {
+    options.is_indented_syntax_src = is_indented_syntax_src;
+}
+
+pub fn sass_option_set_source_map_embed(options: &mut Sass_Options, is_indented_syntax_src: bool) {
+    options.source_map_embed = is_indented_syntax_src;
+}
+
+pub fn sass_option_set_source_map_file<P: Into<PathBuf>>(options: &mut Sass_Options, source_map_file: P) {
+    options.source_map_file = source_map_file.into();
+}
+
+pub fn sass_delete_options(options: &mut Sass_Options) {
+
 }

@@ -18,12 +18,12 @@ pub struct Sass_Inspect_Options {
     pub output_style: Sass_Output_Style,
 
     // Precision for fractional numbers
-    pub precision: i32
+    pub precision: u8
 }
 
 impl Sass_Inspect_Options {
     // Defaults = Nested, 5.
-    pub fn new(style: Sass_Output_Style, precision: i32) -> Self {
+    pub fn new(style: Sass_Output_Style, precision: u8) -> Self {
         Sass_Inspect_Options { output_style: style, precision }
     }
 }
@@ -55,7 +55,7 @@ impl Sass_Output_Options {
     }
 
     // Defaults: indent = two spaces, linefeed = '\n', source_comments = false
-    pub fn new<S>(style: Sass_Output_Style, precision: i32, indent: S, linefeed: S, source_comments: bool) -> Self
+    pub fn new<S>(style: Sass_Output_Style, precision: u8, indent: S, linefeed: S, source_comments: bool) -> Self
         where S: Into<String>
     {
         Sass_Output_Options {

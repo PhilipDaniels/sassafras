@@ -10,6 +10,7 @@ extern crate sassafras;
 use structopt::StructOpt;
 use std::path::PathBuf;
 use sassafras::c_api;
+use std::ffi::OsString;
 
 // TODO: Both of these enums cause a warning to be emitted.
 
@@ -50,7 +51,7 @@ struct Arguments {
 
     /// Set Sass import path.
     #[structopt(short = "I", long = "load-path", parse(from_os_str))]
-    load_path: Option<PathBuf>,
+    include_path: Option<PathBuf>,
 
     /// Set path to autoload plugins.
     #[structopt(short = "P", long = "plugin-path", parse(from_os_str))]
@@ -70,7 +71,7 @@ struct Arguments {
 
     /// Sets the precision for numbers.
     #[structopt(short = "p", long = "precision", default_value = "5")]
-    precision: usize,  // TODO: What is the permissible range here.
+    precision: u8,  // TODO: What is the permissible range here.
 
     /// Treat input as indented syntax.
     #[structopt(short = "a", long = "sass")]
@@ -95,10 +96,195 @@ fn main() {
     let mut options = c_api::sass_make_options();
     c_api::sass_option_set_output_style(&mut options, c_api::Sass_Output_Style::SASS_STYLE_NESTED);
     c_api::sass_option_set_precision(&mut options, 5);
+    c_api::sass_option_set_output_style(&mut options, translate_output_style(args.output_style));
+    c_api::sass_option_set_source_comments(&mut options, args.line_numbers);
+    c_api::sass_option_set_omit_source_map_url(&mut options, args.omit_sourcemap_comment);
+    c_api::sass_option_set_precision(&mut options, args.precision);
+    c_api::sass_option_set_is_indented_syntax_src(&mut options, args.input_is_indented);
 
     if let Some(ext) = args.import_extension {
         c_api::sass_option_push_import_extension(&mut options, ext);
     }
 
+    if let Some(path) = args.include_path {
+        c_api::sass_option_push_include_path(&mut options, path);
+    }
+
+    if let Some(path) = args.plugin_path {
+        c_api::sass_option_push_plugin_path(&mut options, path);
+    }
+
+    let mut auto_source_map = false;
+    let mut generate_source_map = false;
+
+    match args.emit_sourcemap {
+        SourceMapEmission::Auto => { auto_source_map = true; generate_source_map = true }
+        SourceMapEmission::Inline => { c_api::sass_option_set_source_map_embed(&mut options, true); generate_source_map = true }
+        SourceMapEmission::No => { },
+    }
+
+    let mut result = 0;
+    if !args.from_stdin {
+        if generate_source_map {
+            if args.output_file.is_some() {
+                let mut src_map_name = args.output_file.clone().unwrap().into_os_string();
+                src_map_name.push(".map");
+                c_api::sass_option_set_source_map_file(&mut options, src_map_name);
+            } else {
+                c_api::sass_option_set_source_map_embed(&mut options, true);
+            }
+        } else {
+            c_api::sass_option_set_source_map_embed(&mut options, true);
+        }
+
+        // If output_file is None, we write to stdout.
+        result = compile_file(&options, args.input_file, args.output_file);
+    } else {
+        // If output_file is None, we write to stdout.
+        result = compile_stdin(&options, args.output_file);
+    }
+
+    c_api::sass_delete_options(&mut options);
+
     println!("{:#?}", options);
+}
+
+fn translate_output_style(arg_style: OutputStyles) -> c_api::Sass_Output_Style {
+    match arg_style {
+        OutputStyles::Compressed => c_api::Sass_Output_Style::SASS_STYLE_COMPRESSED,
+        OutputStyles::Compact => c_api::Sass_Output_Style::SASS_STYLE_COMPACT,
+        OutputStyles::Expanded => c_api::Sass_Output_Style::SASS_STYLE_EXPANDED,
+        OutputStyles::Nested => c_api::Sass_Output_Style::SASS_STYLE_NESTED
+    }
+}
+
+
+pub fn compile_file(options: &c_api::Sass_Options, input_file: Option<PathBuf>, output_file: Option<PathBuf>) -> i32  {
+//    int ret;
+//    struct Sass_File_Context* ctx = sass_make_file_context(input_path);
+//    struct Sass_Context* ctx_out = sass_file_context_get_context(ctx);
+//    if (outfile) sass_option_set_output_path(options, outfile);
+//    const char* srcmap_file = sass_option_get_source_map_file(options);
+//    sass_option_set_input_path(options, input_path);
+//    sass_file_context_set_options(ctx, options);
+//
+//    sass_compile_file_context(ctx);
+//
+//    ret = output(
+//        sass_context_get_error_status(ctx_out),
+//        sass_context_get_error_message(ctx_out),
+//        sass_context_get_output_string(ctx_out),
+//        outfile
+//    );
+//
+//    if (ret == 0 && srcmap_file) {
+//        ret = output(
+//            sass_context_get_error_status(ctx_out),
+//            sass_context_get_error_message(ctx_out),
+//            sass_context_get_source_map_string(ctx_out),
+//            srcmap_file
+//        );
+//    }
+//
+//    sass_delete_file_context(ctx);
+//    return ret;
+
+    0
+}
+
+pub fn compile_stdin(options: &c_api::Sass_Options, output_file: Option<PathBuf>) -> i32 {
+//    int ret;
+//    struct Sass_Data_Context* ctx;
+//    char buffer[BUFSIZE];
+//    size_t size = 1;
+//    char *source_string = malloc(sizeof(char) * BUFSIZE);
+//
+//    if(source_string == NULL) {
+//        perror("Allocation failed");
+//        #ifdef _WIN32
+//        exit(ERROR_OUTOFMEMORY);
+//        #else
+//        exit(EX_OSERR); // system error (e.g., can't fork)
+//        #endif
+//    }
+//
+//    source_string[0] = '\0';
+//
+//    while(fgets(buffer, BUFSIZE, stdin)) {
+//        char *old = source_string;
+//        size += strlen(buffer);
+//        source_string = realloc(source_string, size);
+//        if(source_string == NULL) {
+//            perror("Reallocation failed");
+//            free(old);
+//            #ifdef _WIN32
+//            exit(ERROR_OUTOFMEMORY);
+//            #else
+//            exit(EX_OSERR); // system error (e.g., can't fork)
+//            #endif
+//        }
+//        strcat(source_string, buffer);
+//    }
+//
+//    if(ferror(stdin)) {
+//        free(source_string);
+//        perror("Error reading standard input");
+//        #ifdef _WIN32
+//        exit(ERROR_READ_FAULT); //
+//        #else
+//        exit(EX_IOERR); // input/output error
+//        #endif
+//    }
+//
+//    ctx = sass_make_data_context(source_string);
+//    struct Sass_Context* ctx_out = sass_data_context_get_context(ctx);
+//    sass_data_context_set_options(ctx, options);
+//    sass_compile_data_context(ctx);
+//    ret = output(
+//        sass_context_get_error_status(ctx_out),
+//        sass_context_get_error_message(ctx_out),
+//        sass_context_get_output_string(ctx_out),
+//        outfile
+//    );
+//    sass_delete_data_context(ctx);
+//    return ret;
+
+    0
+}
+
+fn output() -> i32 {
+//    if (error_status) {
+//        if (error_message) {
+//            fprintf(stderr, "%s", error_message);
+//        } else {
+//            fprintf(stderr, "An error occured; no error message available.\n");
+//        }
+//        return 1;
+//    } else if (output_string) {
+//        if(outfile) {
+//            FILE* fp = fopen(outfile, "wb");
+//            if(!fp) {
+//                perror("Error opening output file");
+//                return 1;
+//            }
+//            if(fprintf(fp, "%s", output_string) < 0) {
+//                perror("Error writing to output file");
+//                fclose(fp);
+//                return 1;
+//            }
+//            fclose(fp);
+//        }
+//            else {
+//                #ifdef _WIN32
+//                setmode(fileno(stdout), O_BINARY);
+//                #endif
+//                printf("%s", output_string);
+//            }
+//        return 0;
+//    } else {
+//        fprintf(stderr, "Unknown internal error.\n");
+//        return 2;
+//    }
+
+    0
 }

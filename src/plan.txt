@@ -8,3 +8,38 @@
 
 Sass_Context is the C context,    it is defined in src/sass_context.hpp
 Sass::Context is the C++ context, it is defined in src/context.hpp
+
+
+
+We have 3 top-level structures in the C API
+===========================================
+Sass_Compiler
+  c_ctx: Sass_Context
+  cpp_ctx: Context
+  root: Block_Obj
+
+Sass_Data_Context
+  Sass_Context
+
+Sass_File_Context
+  Sass_Context
+
+
+where
+
+Sass_Context
+  options: Sass_Options
+    output_options: Sass_Output_Options
+      inspect_options: Sass_Inspect_Options
+
+
+
+Then we have the C++ structure
+==============================
+class Context
+  Sass_Options c_options;
+  Sass_Compiler* c_compiler;
+  // much other stuff
+
+File_Context : Context
+Data_Context : Context
