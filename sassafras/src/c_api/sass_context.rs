@@ -133,55 +133,89 @@ pub struct Sass_Compiler {
 }
 
 // FROM: src/sass_context.cpp.
-pub fn sass_make_options() -> Sass_Options {
+pub fn sass_make_options() -> *mut Sass_Options {
     let mut options = Sass_Options::default();
     options.init();
-    options
+    Box::into_raw(Box::new(options))
 }
 
-// Create getter and setters for options
-pub fn sass_option_set_precision(options: &mut Sass_Options, precision: u8) {
+pub fn sass_delete_options(options_ptr: *mut Sass_Options) {
+    if !options_ptr.is_null() {
+        unsafe {
+            Box::from_raw(options_ptr);
+        }
+    }
+}
+
+fn unpack_ptr<'a>(options_ptr: *mut Sass_Options) -> &'a mut Sass_Options {
+    unsafe { assert!(!options_ptr.is_null()); &mut *options_ptr }
+}
+
+#[no_mangle]
+pub fn sass_option_set_precision(options_ptr: *mut Sass_Options, precision: u8) {
+    let options = unpack_ptr(options_ptr);
     options.output_options.inspect_options.precision = precision;
 }
 
-pub fn sass_option_set_output_style(options: &mut Sass_Options, output_style: Sass_Output_Style) {
+#[no_mangle]
+pub fn sass_option_set_output_style(options_ptr: *mut Sass_Options, output_style: Sass_Output_Style) {
+    let options = unpack_ptr(options_ptr);
     options.output_options.inspect_options.output_style = output_style;
 }
 
-pub fn sass_option_push_import_extension(options: &mut Sass_Options, ext: PathBuf) {
+#[no_mangle]
+pub fn sass_option_push_import_extension(options_ptr: *mut Sass_Options, ext: PathBuf) {
+    let options = unpack_ptr(options_ptr);
     // TODO: These methods that push to these vectors should check for existence and not push if already there.
     options.extensions.push(ext);
 }
 
 // TODO: Use Into<PathBuf>? Is this same for a C API?
-pub fn sass_option_push_include_path(options: &mut Sass_Options, path: PathBuf) {
+#[no_mangle]
+pub fn sass_option_push_include_path(options_ptr: *mut Sass_Options, path: PathBuf) {
+    let options = unpack_ptr(options_ptr);
     options.include_paths.push(path);
 }
 
-pub fn sass_option_push_plugin_path(options: &mut Sass_Options, path: PathBuf) {
+#[no_mangle]
+pub fn sass_option_push_plugin_path(options_ptr: *mut Sass_Options, path: PathBuf) {
+    let options = unpack_ptr(options_ptr);
     options.plugin_paths.push(path);
 }
 
-pub fn sass_option_set_source_comments(options: &mut Sass_Options, source_comments: bool) {
+#[no_mangle]
+pub fn sass_option_set_source_comments(options_ptr: *mut Sass_Options, source_comments: bool) {
+    let options = unpack_ptr(options_ptr);
     options.output_options.source_comments = source_comments;
 }
 
-pub fn sass_option_set_omit_source_map_url(options: &mut Sass_Options, omit_source_map_url: bool) {
+#[no_mangle]
+pub fn sass_option_set_omit_source_map_url(options_ptr: *mut Sass_Options, omit_source_map_url: bool) {
+    let options = unpack_ptr(options_ptr);
     options.omit_source_map_url = omit_source_map_url;
 }
 
-pub fn sass_option_set_is_indented_syntax_src(options: &mut Sass_Options, is_indented_syntax_src: bool) {
+#[no_mangle]
+pub fn sass_option_set_is_indented_syntax_src(options_ptr: *mut Sass_Options, is_indented_syntax_src: bool) {
+    let options = unpack_ptr(options_ptr);
     options.is_indented_syntax_src = is_indented_syntax_src;
 }
 
-pub fn sass_option_set_source_map_embed(options: &mut Sass_Options, is_indented_syntax_src: bool) {
+#[no_mangle]
+pub fn sass_option_set_source_map_embed(options_ptr: *mut Sass_Options, is_indented_syntax_src: bool) {
+    let options = unpack_ptr(options_ptr);
     options.source_map_embed = is_indented_syntax_src;
 }
 
-pub fn sass_option_set_source_map_file<P: Into<PathBuf>>(options: &mut Sass_Options, source_map_file: P) {
+#[no_mangle]
+pub fn sass_option_set_source_map_file<P: Into<PathBuf>>(options_ptr: *mut Sass_Options, source_map_file: P) {
+    let options = unpack_ptr(options_ptr);
     options.source_map_file = source_map_file.into();
 }
 
-pub fn sass_delete_options(options: &mut Sass_Options) {
-
+// For debugging.
+#[no_mangle]
+pub fn sass_option_print(options_ptr: *mut Sass_Options) {
+    let options = unpack_ptr(options_ptr);
+    println!("{:#?}", options);
 }

@@ -8,6 +8,7 @@ structopt = "0.2.8"
 built = "0.3.0"
 clap = "2.31.2"
 sassafras = { path = "sassafras" }
+libc = "*"
 
 [profile.release]
 lto = true
