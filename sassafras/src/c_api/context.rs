@@ -1,5 +1,6 @@
 // FROM: include/sass/context.h
 // Compiler states
+#[repr(C)]
 pub enum Sass_Compiler_State {
     SASS_COMPILER_CREATED,
     SASS_COMPILER_PARSED,

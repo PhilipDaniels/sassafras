@@ -10,7 +10,6 @@ extern crate sassafras;
 use structopt::StructOpt;
 use std::path::PathBuf;
 use sassafras::c_api;
-use std::ffi::OsString;
 
 // TODO: Both of these enums cause a warning to be emitted.
 
@@ -90,6 +89,12 @@ fn main() {
     let args = Arguments::from_args();
     // The program terminates in the line above if arguments are invalid.
 
+    let f = c_api::make_foo();
+    c_api::set_foo(f, 55);
+    c_api::drop_foo(f);
+
+
+
     // sassc uses the C API to drive libsass.
     // For the sake of testing and porting, we will do the same for now,
     // so this is not idiomatic Rust.
@@ -129,7 +134,7 @@ fn main() {
             if args.output_file.is_some() {
                 let mut src_map_name = args.output_file.clone().unwrap().into_os_string();
                 src_map_name.push(".map");
-                c_api::sass_option_set_source_map_file(options, src_map_name);
+                c_api::sass_option_set_source_map_file(options, PathBuf::from(src_map_name));
             } else {
                 c_api::sass_option_set_source_map_embed(options, true);
             }

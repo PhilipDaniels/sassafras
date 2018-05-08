@@ -1,6 +1,7 @@
 // FROM: include/sass/base.hpp
 // Different render styles
 #[derive(Debug)]
+#[repr(C)]
 pub enum Sass_Output_Style {
     SASS_STYLE_NESTED,
     SASS_STYLE_EXPANDED,

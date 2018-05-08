@@ -6,6 +6,7 @@ use super::*;
 
 // sass config options structure
 #[derive(Default, Debug)]
+#[repr(C)]
 pub struct Sass_Options {
     output_options: Sass_Output_Options,
 
@@ -107,6 +108,7 @@ struct Sass_Context {
 }
 
 // struct for file compilation
+#[repr(C)]
 pub struct Sass_File_Context {
     context: Sass_Context
     // no additional fields required
@@ -114,6 +116,7 @@ pub struct Sass_File_Context {
 }
 
 // struct for data compilation
+#[repr(C)]
 pub struct Sass_Data_Context {
     context: Sass_Context,
     source_string: String,
@@ -121,6 +124,7 @@ pub struct Sass_Data_Context {
 }
 
 // link c and cpp context
+#[repr(C)]
 pub struct Sass_Compiler {
     // progress status
     state: Sass_Compiler_State,
@@ -132,23 +136,25 @@ pub struct Sass_Compiler {
     //root: Block_Obj
 }
 
+fn unpack_ptr<'a>(options_ptr: *mut Sass_Options) -> &'a mut Sass_Options {
+    unsafe { assert!(!options_ptr.is_null()); &mut *options_ptr }
+}
+
 // FROM: src/sass_context.cpp.
+#[no_mangle]
 pub fn sass_make_options() -> *mut Sass_Options {
     let mut options = Sass_Options::default();
     options.init();
     Box::into_raw(Box::new(options))
 }
 
+#[no_mangle]
 pub fn sass_delete_options(options_ptr: *mut Sass_Options) {
     if !options_ptr.is_null() {
         unsafe {
             Box::from_raw(options_ptr);
         }
     }
-}
-
-fn unpack_ptr<'a>(options_ptr: *mut Sass_Options) -> &'a mut Sass_Options {
-    unsafe { assert!(!options_ptr.is_null()); &mut *options_ptr }
 }
 
 #[no_mangle]
@@ -170,7 +176,6 @@ pub fn sass_option_push_import_extension(options_ptr: *mut Sass_Options, ext: Pa
     options.extensions.push(ext);
 }
 
-// TODO: Use Into<PathBuf>? Is this same for a C API?
 #[no_mangle]
 pub fn sass_option_push_include_path(options_ptr: *mut Sass_Options, path: PathBuf) {
     let options = unpack_ptr(options_ptr);
@@ -208,9 +213,9 @@ pub fn sass_option_set_source_map_embed(options_ptr: *mut Sass_Options, is_inden
 }
 
 #[no_mangle]
-pub fn sass_option_set_source_map_file<P: Into<PathBuf>>(options_ptr: *mut Sass_Options, source_map_file: P) {
+pub fn sass_option_set_source_map_file(options_ptr: *mut Sass_Options, source_map_file: PathBuf) {
     let options = unpack_ptr(options_ptr);
-    options.source_map_file = source_map_file.into();
+    options.source_map_file = source_map_file;
 }
 
 // For debugging.
@@ -219,3 +224,45 @@ pub fn sass_option_print(options_ptr: *mut Sass_Options) {
     let options = unpack_ptr(options_ptr);
     println!("{:#?}", options);
 }
+
+pub enum Foo { }
+pub enum Bar { }
+type FooPtr = *mut Foo;
+type BarPtr = *mut Foo;
+
+struct InnerFoo {
+    x: i32
+}
+
+impl Drop for InnerFoo {
+    fn drop(&mut self) {
+        println!("Dropping {}", self.x);
+    }
+}
+
+use std::mem::transmute;
+
+#[no_mangle]
+pub fn make_foo() -> FooPtr {
+    let foo = InnerFoo { x: 3 };
+    let b = Box::new(foo);
+    unsafe { transmute(b) }
+}
+
+
+#[no_mangle]
+pub fn set_foo(ptr: FooPtr, x: i32) {
+    let foo = unpack_ptr2(ptr);
+    foo.x = x;
+}
+
+fn unpack_ptr2<'a>(ptr: FooPtr) -> &'a mut InnerFoo {
+    //unsafe { assert!(!ptr.is_null()); transmute(&mut *ptr) }
+    unsafe { assert!(!ptr.is_null()); transmute(ptr) }
+}
+
+#[no_mangle]
+pub fn drop_foo(ptr: FooPtr) {
+    let _drop: Box<InnerFoo> = unsafe { transmute(ptr) };
+}
+

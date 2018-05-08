@@ -4,6 +4,7 @@ use super::Sass_Output_Style;
 
 // input behaviours
 #[derive(Debug)]
+#[repr(C)]
 pub enum Sass_Input_Style {
     SASS_CONTEXT_NULL,
     SASS_CONTEXT_FILE,
@@ -13,6 +14,7 @@ pub enum Sass_Input_Style {
 
 // sass config options structure
 #[derive(Default, Debug)]
+#[repr(C)]
 pub struct Sass_Inspect_Options {
     // Output style for the generated css code
     pub output_style: Sass_Output_Style,
@@ -29,6 +31,7 @@ impl Sass_Inspect_Options {
 }
 
 #[derive(Default, Debug)]
+#[repr(C)]
 pub struct Sass_Output_Options {
     pub inspect_options: Sass_Inspect_Options,
     // String to be used for indentation
