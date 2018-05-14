@@ -74,7 +74,7 @@ pub struct Sass_Options {
 }
 
 impl Sass_Options {
-    fn init(&mut self) {
+    pub fn init(&mut self) {
         self.output_options.inspect_options.precision = 5;
         self.output_options.indent = "  ".to_string();
         self.output_options.linefeed = "\n".to_string()
@@ -140,16 +140,16 @@ fn unpack_ptr<'a>(options_ptr: *mut Sass_Options) -> &'a mut Sass_Options {
     unsafe { assert!(!options_ptr.is_null()); &mut *options_ptr }
 }
 
-// FROM: src/sass_context.cpp.
-#[no_mangle]
-pub fn sass_make_options() -> *mut Sass_Options {
-    let mut options = Sass_Options::default();
-    options.init();
-    Box::into_raw(Box::new(options))
-}
+//// FROM: src/sass_context.cpp.
+//#[no_mangle]
+//pub extern "C" fn sass_make_options() -> *mut Sass_Options {
+//    let mut options = Sass_Options::default();
+//    options.init();
+//    Box::into_raw(Box::new(options))
+//}
 
 #[no_mangle]
-pub fn sass_delete_options(options_ptr: *mut Sass_Options) {
+pub extern "C" fn sass_delete_options(options_ptr: *mut Sass_Options) {
     if !options_ptr.is_null() {
         unsafe {
             Box::from_raw(options_ptr);
@@ -158,7 +158,7 @@ pub fn sass_delete_options(options_ptr: *mut Sass_Options) {
 }
 
 #[no_mangle]
-pub fn sass_option_set_precision(options_ptr: *mut Sass_Options, precision: u8) {
+pub extern "C" fn sass_option_set_precision(options_ptr: *mut Sass_Options, precision: u8) {
     let options = unpack_ptr(options_ptr);
     options.output_options.inspect_options.precision = precision;
 }

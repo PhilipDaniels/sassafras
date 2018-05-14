@@ -6,5 +6,6 @@ authors = ["Philip Daniels <Philip.Daniels1971@gmail.com>"]
 [dependencies]
 libc = "*"
 
-#[lib]
-#crate-type = ["cdylib"]
+[lib]
+crate-type = ["staticlib"]
+
