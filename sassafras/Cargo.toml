@@ -7,5 +7,9 @@ authors = ["Philip Daniels <Philip.Daniels1971@gmail.com>"]
 libc = "*"
 
 [lib]
-crate-type = ["staticlib"]
+# This makes both a Rust library and a static C Linux library.
+# The appropriate GCC command is something like
+#     gcc -o linktest linktest.c -L../target/debug -lsassafras -lpthread -ldl
+# See also https://doc.rust-lang.org/reference/linkage.html
+crate-type = ["staticlib", "lib"]
 

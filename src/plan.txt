@@ -45,12 +45,3 @@ File_Context : Context
 Data_Context : Context
 
 
-The entire C API must be represented using C types.
-This makes those structs near-impossible to use in the internals of the program.
-Interestingly, the libsass C API headers only use forward headers so that they can
-define pointers. Everything is pointers, enums (ints) or fundamental types
-such as size_t or bool.
-
-The question is how can I make a true opaque pointer?
-
-

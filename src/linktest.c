@@ -21,14 +21,24 @@
 
 #endif
 
-
-
 // Some simple function signatures from libsass.
 struct Sass_Options; // base struct
 
 ADDAPI struct Sass_Options* ADDCALL sass_make_options (void);
 ADDAPI void ADDCALL sass_delete_options(struct Sass_Options* options);
 ADDAPI void ADDCALL sass_option_set_precision (struct Sass_Options* options, int precision);
+
+
+
+// The above are C headers from libsass inlined into this file.
+// Rust does not actually care what you call the structs (e.g. Sass_Options)
+// as all communication is done via opaque pointers. Therefore inside the
+// Rust library we can use more Rustonic names.
+//
+// The Rust-side structs can use Rust types, e.g. String, however
+// all the public API functions must use C-compatible types, and hence
+// you must translate between the two at the API level.
+
 
 
 // .a is a static library

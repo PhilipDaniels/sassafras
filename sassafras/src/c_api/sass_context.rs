@@ -141,15 +141,15 @@ fn unpack_ptr<'a>(options_ptr: *mut Sass_Options) -> &'a mut Sass_Options {
 }
 
 //// FROM: src/sass_context.cpp.
-//#[no_mangle]
-//pub extern "C" fn sass_make_options() -> *mut Sass_Options {
-//    let mut options = Sass_Options::default();
-//    options.init();
-//    Box::into_raw(Box::new(options))
-//}
+#[no_mangle]
+pub extern fn sass_make_options() -> *mut Sass_Options {
+    let mut options = Sass_Options::default();
+    options.init();
+    Box::into_raw(Box::new(options))
+}
 
 #[no_mangle]
-pub extern "C" fn sass_delete_options(options_ptr: *mut Sass_Options) {
+pub extern fn sass_delete_options(options_ptr: *mut Sass_Options) {
     if !options_ptr.is_null() {
         unsafe {
             Box::from_raw(options_ptr);
@@ -158,7 +158,7 @@ pub extern "C" fn sass_delete_options(options_ptr: *mut Sass_Options) {
 }
 
 #[no_mangle]
-pub extern "C" fn sass_option_set_precision(options_ptr: *mut Sass_Options, precision: u8) {
+pub extern fn sass_option_set_precision(options_ptr: *mut Sass_Options, precision: u8) {
     let options = unpack_ptr(options_ptr);
     options.output_options.inspect_options.precision = precision;
 }
