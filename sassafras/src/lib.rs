@@ -2,6 +2,6 @@
 #[allow(unused_variables)]
 #[allow(dead_code)]
 
-extern crate libc;
+//extern crate libc;
 
 pub mod c_api;

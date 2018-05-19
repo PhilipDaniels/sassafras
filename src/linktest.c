@@ -58,8 +58,8 @@ int main() {
 
     // symbol is not defined for some reason in the apt-getted library. Looks like a Mint error:
     // https://forums.linuxmint.com/viewtopic.php?f=47&t=268871
-    //sass_delete_options(opt);
-    //printf("sass_delete_options ok\n");
+    sass_delete_options(opt);
+    printf("sass_delete_options ok\n");
 
     return 0;
 }

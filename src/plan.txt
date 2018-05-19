@@ -45,3 +45,6 @@ File_Context : Context
 Data_Context : Context
 
 
+The way I am allocating and dropping structs using Box() is correct according to
+https://www.reddit.com/r/rust/comments/3r5icb/exposing_rust_struct_to_python/
+

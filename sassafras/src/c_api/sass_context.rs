@@ -1,6 +1,5 @@
 // FROM: src/sass_context.hpp
 
-
 use std::path::PathBuf;
 use super::*;
 
@@ -74,10 +73,23 @@ pub struct Sass_Options {
 }
 
 impl Sass_Options {
+    pub fn new() -> Self {
+        let mut options = Sass_Options::default();
+        options.init();
+        options
+    }
+
     pub fn init(&mut self) {
         self.output_options.inspect_options.precision = 5;
         self.output_options.indent = "  ".to_string();
         self.output_options.linefeed = "\n".to_string()
+    }
+}
+
+// For debugging, to show that something is actually dropped.
+impl Drop for Sass_Options {
+    fn drop(&mut self) {
+        println!("Dropping Sass_Options `{:#?}`!", self);
     }
 }
 
@@ -137,14 +149,19 @@ pub struct Sass_Compiler {
 }
 
 fn unpack_ptr<'a>(options_ptr: *mut Sass_Options) -> &'a mut Sass_Options {
-    unsafe { assert!(!options_ptr.is_null()); &mut *options_ptr }
+    assert!(!options_ptr.is_null());
+
+    unsafe {
+        &mut *options_ptr
+    }
 }
 
 //// FROM: src/sass_context.cpp.
 #[no_mangle]
 pub extern fn sass_make_options() -> *mut Sass_Options {
-    let mut options = Sass_Options::default();
-    options.init();
+    let mut options = Sass_Options::new();
+    // Box::new() places the options struct onto the heap, then
+    // into_raw() ensures it is not cleaned up.
     Box::into_raw(Box::new(options))
 }
 
@@ -152,6 +169,8 @@ pub extern fn sass_make_options() -> *mut Sass_Options {
 pub extern fn sass_delete_options(options_ptr: *mut Sass_Options) {
     if !options_ptr.is_null() {
         unsafe {
+            // from_raw() constructs a box, which is then automatically dropped
+            // at the end of the scope, calling drop() on the struct.
             Box::from_raw(options_ptr);
         }
     }

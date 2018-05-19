@@ -169,9 +169,6 @@ dependencies = [
 [[package]]
 name = "sassafras"
 version = "0.1.0"
-dependencies = [
- "libc 0.2.40 (registry+https://github.com/rust-lang/crates.io-index)",
-]
 
 [[package]]
 name = "sassafrasc"

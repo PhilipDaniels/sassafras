@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Philip Daniels <Philip.Daniels1971@gmail.com>"]
 
 [dependencies]
-libc = "*"
+##libc = "*"
 
 [lib]
 # This makes both a Rust library and a static C Linux library.
