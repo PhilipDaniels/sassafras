@@ -1,32 +1,21 @@
-// FROM: src/sass.hpp       // TODO This is not internal, not really part of the external API.
+use sass_inspect_options::Sass_Inspect_Options;
 
-use super::Sass_Output_Style;
-
-// input behaviours
+// Different render styles
 #[derive(Debug)]
 #[repr(C)]
-pub enum Sass_Input_Style {
-    SASS_CONTEXT_NULL,
-    SASS_CONTEXT_FILE,
-    SASS_CONTEXT_DATA,
-    SASS_CONTEXT_FOLDER
+pub enum Sass_Output_Style {
+    SASS_STYLE_NESTED,
+    SASS_STYLE_EXPANDED,
+    SASS_STYLE_COMPACT,
+    SASS_STYLE_COMPRESSED,
+    // only used internaly
+    SASS_STYLE_INSPECT,
+    SASS_STYLE_TO_SASS
 }
 
-// sass config options structure
-#[derive(Default, Debug)]
-#[repr(C)]
-pub struct Sass_Inspect_Options {
-    // Output style for the generated css code
-    pub output_style: Sass_Output_Style,
-
-    // Precision for fractional numbers
-    pub precision: u8
-}
-
-impl Sass_Inspect_Options {
-    // Defaults = Nested, 5.
-    pub fn new(style: Sass_Output_Style, precision: u8) -> Self {
-        Sass_Inspect_Options { output_style: style, precision }
+impl Default for Sass_Output_Style {
+    fn default() -> Self {
+        Sass_Output_Style::SASS_STYLE_NESTED
     }
 }
 

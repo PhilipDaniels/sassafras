@@ -1,12 +1,3 @@
-// FROM: include/sass/context.h
-// Compiler states
-#[repr(C)]
-pub enum Sass_Compiler_State {
-    SASS_COMPILER_CREATED,
-    SASS_COMPILER_PARSED,
-    SASS_COMPILER_EXECUTED
-}
-
 //// Create and initialize an option struct
 //ADDAPI struct Sass_Options* ADDCALL sass_make_options (void);
 //// Create and initialize a specific context

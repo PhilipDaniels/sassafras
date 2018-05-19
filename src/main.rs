@@ -9,7 +9,8 @@ extern crate sassafras;
 
 use structopt::StructOpt;
 use std::path::PathBuf;
-use sassafras::c_api;
+use sassafras::sass_options::*;
+use sassafras::sass_output_options::Sass_Output_Style;
 
 // TODO: Both of these enums cause a warning to be emitted.
 
@@ -92,25 +93,25 @@ fn main() {
     // sassc uses the C API to drive libsass.
     // For the sake of testing and porting, we will do the same for now,
     // so this is not idiomatic Rust.
-    let options = c_api::sass_make_options();
-    c_api::sass_option_set_output_style(options, c_api::Sass_Output_Style::SASS_STYLE_NESTED);
-    c_api::sass_option_set_precision(options, 5);
-    c_api::sass_option_set_output_style(options, translate_output_style(args.output_style));
-    c_api::sass_option_set_source_comments(options, args.line_numbers);
-    c_api::sass_option_set_omit_source_map_url(options, args.omit_sourcemap_comment);
-    c_api::sass_option_set_precision(options, args.precision);
-    c_api::sass_option_set_is_indented_syntax_src(options, args.input_is_indented);
+    let options = sass_make_options();
+    sass_option_set_output_style(options, Sass_Output_Style::SASS_STYLE_NESTED);
+    sass_option_set_precision(options, 5);
+    sass_option_set_output_style(options, translate_output_style(args.output_style));
+    sass_option_set_source_comments(options, args.line_numbers);
+    sass_option_set_omit_source_map_url(options, args.omit_sourcemap_comment);
+    sass_option_set_precision(options, args.precision);
+    sass_option_set_is_indented_syntax_src(options, args.input_is_indented);
 
     if let Some(ext) = args.import_extension {
-        c_api::sass_option_push_import_extension(options, ext);
+        sass_option_push_import_extension(options, ext);
     }
 
     if let Some(path) = args.include_path {
-        c_api::sass_option_push_include_path(options, path);
+        sass_option_push_include_path(options, path);
     }
 
     if let Some(path) = args.plugin_path {
-        c_api::sass_option_push_plugin_path(options, path);
+        sass_option_push_plugin_path(options, path);
     }
 
     let mut auto_source_map = false;
@@ -118,7 +119,7 @@ fn main() {
 
     match args.emit_sourcemap {
         SourceMapEmission::Auto => { auto_source_map = true; generate_source_map = true }
-        SourceMapEmission::Inline => { c_api::sass_option_set_source_map_embed(options, true); generate_source_map = true }
+        SourceMapEmission::Inline => { sass_option_set_source_map_embed(options, true); generate_source_map = true }
         SourceMapEmission::No => { },
     }
 
@@ -128,12 +129,12 @@ fn main() {
             if args.output_file.is_some() {
                 let mut src_map_name = args.output_file.clone().unwrap().into_os_string();
                 src_map_name.push(".map");
-                c_api::sass_option_set_source_map_file(options, PathBuf::from(src_map_name));
+                sass_option_set_source_map_file(options, PathBuf::from(src_map_name));
             } else {
-                c_api::sass_option_set_source_map_embed(options, true);
+                sass_option_set_source_map_embed(options, true);
             }
         } else {
-            c_api::sass_option_set_source_map_embed(options, true);
+            sass_option_set_source_map_embed(options, true);
         }
 
         // If output_file is None, we write to stdout.
@@ -143,21 +144,21 @@ fn main() {
         result = compile_stdin(options, args.output_file);
     }
 
-    c_api::sass_option_print(options);
-    c_api::sass_delete_options(options);
+    sass_option_print(options);
+    sass_delete_options(options);
 }
 
-fn translate_output_style(arg_style: OutputStyles) -> c_api::Sass_Output_Style {
+fn translate_output_style(arg_style: OutputStyles) -> Sass_Output_Style {
     match arg_style {
-        OutputStyles::Compressed => c_api::Sass_Output_Style::SASS_STYLE_COMPRESSED,
-        OutputStyles::Compact => c_api::Sass_Output_Style::SASS_STYLE_COMPACT,
-        OutputStyles::Expanded => c_api::Sass_Output_Style::SASS_STYLE_EXPANDED,
-        OutputStyles::Nested => c_api::Sass_Output_Style::SASS_STYLE_NESTED
+        OutputStyles::Compressed => Sass_Output_Style::SASS_STYLE_COMPRESSED,
+        OutputStyles::Compact => Sass_Output_Style::SASS_STYLE_COMPACT,
+        OutputStyles::Expanded => Sass_Output_Style::SASS_STYLE_EXPANDED,
+        OutputStyles::Nested => Sass_Output_Style::SASS_STYLE_NESTED
     }
 }
 
 
-pub fn compile_file(options_ptr: *mut c_api::Sass_Options, input_file: Option<PathBuf>, output_file: Option<PathBuf>) -> i32  {
+pub fn compile_file(options_ptr: *mut Sass_Options, input_file: Option<PathBuf>, output_file: Option<PathBuf>) -> i32  {
 //    int ret;
 //    struct Sass_File_Context* ctx = sass_make_file_context(input_path);
 //    struct Sass_Context* ctx_out = sass_file_context_get_context(ctx);
@@ -190,7 +191,7 @@ pub fn compile_file(options_ptr: *mut c_api::Sass_Options, input_file: Option<Pa
     0
 }
 
-pub fn compile_stdin(options_ptr: *mut c_api::Sass_Options, output_file: Option<PathBuf>) -> i32 {
+pub fn compile_stdin(options_ptr: *mut Sass_Options, output_file: Option<PathBuf>) -> i32 {
 //    int ret;
 //    struct Sass_Data_Context* ctx;
 //    char buffer[BUFSIZE];

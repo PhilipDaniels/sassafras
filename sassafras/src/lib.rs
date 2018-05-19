@@ -4,4 +4,15 @@
 
 //extern crate libc;
 
-pub mod c_api;
+pub mod base;
+pub mod context;
+pub mod functions;
+pub mod sass2scss;
+pub mod sass_compiler;
+pub mod sass_context;
+pub mod sass_data_context;
+pub mod sass_file_context;
+pub mod sass_inspect_options;
+pub mod sass_options;
+pub mod sass_output_options;
+

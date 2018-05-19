@@ -1,23 +1,3 @@
-// FROM: include/sass/base.hpp
-// Different render styles
-#[derive(Debug)]
-#[repr(C)]
-pub enum Sass_Output_Style {
-    SASS_STYLE_NESTED,
-    SASS_STYLE_EXPANDED,
-    SASS_STYLE_COMPACT,
-    SASS_STYLE_COMPRESSED,
-    // only used internaly
-    SASS_STYLE_INSPECT,
-    SASS_STYLE_TO_SASS
-}
-
-impl Default for Sass_Output_Style {
-    fn default() -> Self {
-        Sass_Output_Style::SASS_STYLE_NESTED
-    }
-}
-
 /*
 // to allocate buffer to be filled
 ADDAPI void* ADDCALL sass_alloc_memory(size_t size);

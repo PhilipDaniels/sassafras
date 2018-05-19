@@ -1,7 +1,5 @@
-// FROM: src/sass_context.hpp
-
 use std::path::PathBuf;
-use super::*;
+use sass_output_options::{Sass_Output_Style, Sass_Output_Options};
 
 // sass config options structure
 #[derive(Default, Debug)]
@@ -91,61 +89,6 @@ impl Drop for Sass_Options {
     fn drop(&mut self) {
         println!("Dropping Sass_Options `{:#?}`!", self);
     }
-}
-
-// base for all contexts
-struct Sass_Context {
-    options: Sass_Options,
-    // store context type info
-    context_type: Sass_Input_Style,
-    // generated output data
-    output_string: String,
-    // generated source map json
-    source_map_string: String,
-
-    // error status
-    error_status: i32,
-    error_json: String,
-    error_text: String,
-    error_message: String,
-
-    // error position
-    error_file: PathBuf,
-    error_line: usize,
-    error_column: usize,
-    error_src: String,
-
-    // report imported files
-    included_files: Vec<PathBuf>
-}
-
-// struct for file compilation
-#[repr(C)]
-pub struct Sass_File_Context {
-    context: Sass_Context
-    // no additional fields required
-    // input_path is already on options
-}
-
-// struct for data compilation
-#[repr(C)]
-pub struct Sass_Data_Context {
-    context: Sass_Context,
-    source_string: String,
-    srcmap_string: String
-}
-
-// link c and cpp context
-#[repr(C)]
-pub struct Sass_Compiler {
-    // progress status
-    state: Sass_Compiler_State,
-    // original c context
-    c_ctx: Sass_Context,
-    // Sass::Context
-    //cpp_ctx: Context,
-    // Sass::Block
-    //root: Block_Obj
 }
 
 fn unpack_ptr<'a>(options_ptr: *mut Sass_Options) -> &'a mut Sass_Options {
