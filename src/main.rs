@@ -89,15 +89,6 @@ fn main() {
     let args = Arguments::from_args();
     // The program terminates in the line above if arguments are invalid.
 
-    let f = c_api::make_foo();
-    let f2 = c_api::make_foo();
-    c_api::set_foo(f, 55);
-    c_api::drop_foo(f);
-    c_api::drop_foo(f);
-    c_api::set_foo(f2, 155);
-    c_api::drop_foo(f2);
-
-
     // sassc uses the C API to drive libsass.
     // For the sake of testing and porting, we will do the same for now,
     // so this is not idiomatic Rust.
