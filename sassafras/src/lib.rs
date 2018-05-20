@@ -5,7 +5,6 @@
 //extern crate libc;
 
 pub mod base;
-pub mod context;
 pub mod functions;
 pub mod sass2scss;
 pub mod sass_compiler;
