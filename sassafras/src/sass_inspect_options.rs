@@ -1,19 +1,19 @@
-use sass_output_options::Sass_Output_Style;
+use sass_output_options::SassOutputStyle;
 
 // sass config options structure
 #[derive(Default, Debug)]
 #[repr(C)]
-pub struct Sass_Inspect_Options {
+pub struct SassInspectOptions {
     // Output style for the generated css code
-    pub output_style: Sass_Output_Style,
+    pub output_style: SassOutputStyle,
 
     // Precision for fractional numbers
     pub precision: u8
 }
 
-impl Sass_Inspect_Options {
+impl SassInspectOptions {
     // Defaults = Nested, 5.
-    pub fn new(style: Sass_Output_Style, precision: u8) -> Self {
-        Sass_Inspect_Options { output_style: style, precision }
+    pub fn new(style: SassOutputStyle, precision: u8) -> Self {
+        SassInspectOptions { output_style: style, precision }
     }
 }

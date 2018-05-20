@@ -1,5 +1,4 @@
 #[allow(non_camel_case_types)]
-
 extern crate built;
 #[macro_use]
 extern crate clap;
@@ -10,7 +9,7 @@ extern crate sassafras;
 use structopt::StructOpt;
 use std::path::PathBuf;
 use sassafras::sass_options::*;
-use sassafras::sass_output_options::Sass_Output_Style;
+use sassafras::sass_output_options::SassOutputStyle;
 
 // TODO: Both of these enums cause a warning to be emitted.
 
@@ -94,7 +93,7 @@ fn main() {
     // For the sake of testing and porting, we will do the same for now,
     // so this is not idiomatic Rust.
     let options = sass_make_options();
-    sass_option_set_output_style(options, Sass_Output_Style::SASS_STYLE_NESTED);
+    sass_option_set_output_style(options, SassOutputStyle::Nested);
     sass_option_set_precision(options, 5);
     sass_option_set_output_style(options, translate_output_style(args.output_style));
     sass_option_set_source_comments(options, args.line_numbers);
@@ -118,9 +117,15 @@ fn main() {
     let mut generate_source_map = false;
 
     match args.emit_sourcemap {
-        SourceMapEmission::Auto => { auto_source_map = true; generate_source_map = true }
-        SourceMapEmission::Inline => { sass_option_set_source_map_embed(options, true); generate_source_map = true }
-        SourceMapEmission::No => { },
+        SourceMapEmission::Auto => {
+            auto_source_map = true;
+            generate_source_map = true
+        }
+        SourceMapEmission::Inline => {
+            sass_option_set_source_map_embed(options, true);
+            generate_source_map = true
+        }
+        SourceMapEmission::No => {}
     }
 
     let mut result = 0;
@@ -148,17 +153,17 @@ fn main() {
     sass_delete_options(options);
 }
 
-fn translate_output_style(arg_style: OutputStyles) -> Sass_Output_Style {
+fn translate_output_style(arg_style: OutputStyles) -> SassOutputStyle {
     match arg_style {
-        OutputStyles::Compressed => Sass_Output_Style::SASS_STYLE_COMPRESSED,
-        OutputStyles::Compact => Sass_Output_Style::SASS_STYLE_COMPACT,
-        OutputStyles::Expanded => Sass_Output_Style::SASS_STYLE_EXPANDED,
-        OutputStyles::Nested => Sass_Output_Style::SASS_STYLE_NESTED
+        OutputStyles::Compressed => SassOutputStyle::Compressed,
+        OutputStyles::Compact => SassOutputStyle::Compact,
+        OutputStyles::Expanded => SassOutputStyle::Expanded,
+        OutputStyles::Nested => SassOutputStyle::Nested
     }
 }
 
 
-pub fn compile_file(options_ptr: *mut Sass_Options, input_file: Option<PathBuf>, output_file: Option<PathBuf>) -> i32  {
+pub fn compile_file(options_ptr: *mut SassOptions, input_file: Option<PathBuf>, output_file: Option<PathBuf>) -> i32 {
 //    int ret;
 //    struct Sass_File_Context* ctx = sass_make_file_context(input_path);
 //    struct Sass_Context* ctx_out = sass_file_context_get_context(ctx);
@@ -191,7 +196,7 @@ pub fn compile_file(options_ptr: *mut Sass_Options, input_file: Option<PathBuf>,
     0
 }
 
-pub fn compile_stdin(options_ptr: *mut Sass_Options, output_file: Option<PathBuf>) -> i32 {
+pub fn compile_stdin(options_ptr: *mut SassOptions, output_file: Option<PathBuf>) -> i32 {
 //    int ret;
 //    struct Sass_Data_Context* ctx;
 //    char buffer[BUFSIZE];

@@ -1,11 +1,11 @@
-use sass_context::Sass_Context;
+use sass_context::SassContext;
 
 // struct for data compilation
 #[repr(C)]
-pub struct Sass_Data_Context {
-    context: Sass_Context,
+pub struct SassDataContext {
+    context: SassContext,
     source_string: String,
-    srcmap_string: String
+    srcmap_string: String,
 }
 
 

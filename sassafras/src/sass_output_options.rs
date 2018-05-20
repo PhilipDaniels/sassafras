@@ -1,28 +1,28 @@
-use sass_inspect_options::Sass_Inspect_Options;
+use sass_inspect_options::SassInspectOptions;
 
 // Different render styles
 #[derive(Debug)]
 #[repr(C)]
-pub enum Sass_Output_Style {
-    SASS_STYLE_NESTED,
-    SASS_STYLE_EXPANDED,
-    SASS_STYLE_COMPACT,
-    SASS_STYLE_COMPRESSED,
+pub enum SassOutputStyle {
+    Nested,
+    Expanded,
+    Compact,
+    Compressed,
     // only used internaly
-    SASS_STYLE_INSPECT,
-    SASS_STYLE_TO_SASS
+    Inspect,
+    ToSass
 }
 
-impl Default for Sass_Output_Style {
+impl Default for SassOutputStyle {
     fn default() -> Self {
-        Sass_Output_Style::SASS_STYLE_NESTED
+        SassOutputStyle::Nested
     }
 }
 
 #[derive(Default, Debug)]
 #[repr(C)]
-pub struct Sass_Output_Options {
-    pub inspect_options: Sass_Inspect_Options,
+pub struct SassOutputOptions {
+    pub inspect_options: SassInspectOptions,
     // String to be used for indentation
     pub indent: String,
     // String to be used to for line feeds
@@ -33,12 +33,12 @@ pub struct Sass_Output_Options {
 }
 
 // sass config options structure
-impl Sass_Output_Options {
+impl SassOutputOptions {
     // Defaults: indent = two spaces, linefeed = '\n', source_comments = false
-    pub fn new_from_options<S>(opt: Sass_Inspect_Options, indent: S, linefeed: S, source_comments: bool) -> Self
+    pub fn new_from_options<S>(opt: SassInspectOptions, indent: S, linefeed: S, source_comments: bool) -> Self
         where S: Into<String>
     {
-        Sass_Output_Options {
+        SassOutputOptions {
             inspect_options: opt,
             indent: indent.into(),
             linefeed: linefeed.into(),
@@ -47,11 +47,11 @@ impl Sass_Output_Options {
     }
 
     // Defaults: indent = two spaces, linefeed = '\n', source_comments = false
-    pub fn new<S>(style: Sass_Output_Style, precision: u8, indent: S, linefeed: S, source_comments: bool) -> Self
+    pub fn new<S>(style: SassOutputStyle, precision: u8, indent: S, linefeed: S, source_comments: bool) -> Self
         where S: Into<String>
     {
-        Sass_Output_Options {
-            inspect_options: Sass_Inspect_Options::new(style, precision),
+        SassOutputOptions {
+            inspect_options: SassInspectOptions::new(style, precision),
             indent: indent.into(),
             linefeed: linefeed.into(),
             source_comments

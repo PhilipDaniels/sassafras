@@ -1,20 +1,20 @@
-use sass_context::Sass_Context;
+use sass_context::SassContext;
 
 // Compiler states
 #[repr(C)]
-pub enum Sass_Compiler_State {
-    SASS_COMPILER_CREATED,
-    SASS_COMPILER_PARSED,
-    SASS_COMPILER_EXECUTED
+pub enum SassCompilerState {
+    Created,
+    Parsed,
+    Executed
 }
 
 // link c and cpp context
 #[repr(C)]
-pub struct Sass_Compiler {
+pub struct SassCompiler {
     // progress status
-    state: Sass_Compiler_State,
+    state: SassCompilerState,
     // original c context
-    c_ctx: Sass_Context,
+    c_ctx: SassContext,
     // Sass::Context
     //cpp_ctx: Context,
     // Sass::Block

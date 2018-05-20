@@ -1,9 +1,9 @@
-use sass_context::Sass_Context;
+use sass_context::SassContext;
 
 // struct for file compilation
 #[repr(C)]
-pub struct Sass_File_Context {
-    context: Sass_Context
+pub struct SassFileContext {
+    context: SassContext
     // no additional fields required
     // input_path is already on options
 }

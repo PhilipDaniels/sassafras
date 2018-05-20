@@ -1,21 +1,21 @@
-use sass_options::Sass_Options;
+use sass_options::SassOptions;
 use std::path::PathBuf;
 
 // input behaviours
 #[derive(Debug)]
 #[repr(C)]
-pub enum Sass_Input_Style {
-    SASS_CONTEXT_NULL,
-    SASS_CONTEXT_FILE,
-    SASS_CONTEXT_DATA,
-    SASS_CONTEXT_FOLDER
+pub enum SassInputStyle {
+    Null,
+    File,
+    Data,
+    Folder,
 }
 
 // base for all contexts
-pub struct Sass_Context {
-    options: Sass_Options,
+pub struct SassContext {
+    options: SassOptions,
     // store context type info
-    context_type: Sass_Input_Style,
+    context_type: SassInputStyle,
     // generated output data
     output_string: String,
     // generated source map json
@@ -34,7 +34,7 @@ pub struct Sass_Context {
     error_src: String,
 
     // report imported files
-    included_files: Vec<PathBuf>
+    included_files: Vec<PathBuf>,
 }
 
 //// Getters for Sass_Context values
