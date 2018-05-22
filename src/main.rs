@@ -5,11 +5,17 @@ extern crate clap;
 #[macro_use]
 extern crate structopt;
 extern crate sassafras;
+extern crate core;
 
 use structopt::StructOpt;
 use std::path::PathBuf;
 use sassafras::sass_options::*;
 use sassafras::sass_output_options::SassOutputStyle;
+use std::path::Path;
+use std::os::raw::c_char;
+use std::ffi::OsString;
+use std::ffi::CString;
+use std::panic;
 
 // TODO: Both of these enums cause a warning to be emitted.
 
@@ -85,6 +91,22 @@ struct Arguments {
     output_file: Option<PathBuf>,
 }
 
+
+#[cfg(unix)]
+fn path_to_cstring(path: &Path) -> CString {
+    use std::os::unix::ffi::OsStrExt;
+
+    CString::new(path.as_os_str().as_bytes()).expect("Conversion to work")
+}
+
+#[cfg(windows)]
+fn path_to_cstring(path: &Path) -> CString {
+    match path.to_str() {
+        Some(s) => CString::new(s),
+        None => panic!("Could not convert path to cstring")
+    }
+}
+
 fn main() {
     let args = Arguments::from_args();
     // The program terminates in the line above if arguments are invalid.
@@ -102,7 +124,8 @@ fn main() {
     sass_option_set_is_indented_syntax_src(options, args.input_is_indented);
 
     if let Some(ext) = args.import_extension {
-        sass_option_push_import_extension(options, ext);
+        let cstring = path_to_cstring(&ext);
+        sass_option_push_import_extension(options, cstring.as_ptr());
     }
 
     if let Some(path) = args.include_path {
