@@ -4,6 +4,7 @@
 extern crate libc;
 
 pub mod base;
+pub mod c_api_helpers;
 pub mod functions;
 pub mod sass2scss;
 pub mod sass_compiler;

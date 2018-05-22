@@ -16,6 +16,7 @@ use std::os::raw::c_char;
 use std::ffi::OsString;
 use std::ffi::CString;
 use std::panic;
+use sassafras::c_api_helpers::path_to_cstring;
 
 // TODO: Both of these enums cause a warning to be emitted.
 
@@ -92,20 +93,7 @@ struct Arguments {
 }
 
 
-#[cfg(unix)]
-fn path_to_cstring(path: &Path) -> CString {
-    use std::os::unix::ffi::OsStrExt;
 
-    CString::new(path.as_os_str().as_bytes()).expect("Conversion to work")
-}
-
-#[cfg(windows)]
-fn path_to_cstring(path: &Path) -> CString {
-    match path.to_str() {
-        Some(s) => CString::new(s),
-        None => panic!("Could not convert path to cstring")
-    }
-}
 
 fn main() {
     let args = Arguments::from_args();

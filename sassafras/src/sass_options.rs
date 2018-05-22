@@ -1,9 +1,8 @@
 use std::path::PathBuf;
 use sass_output_options::{SassOutputStyle, SassOutputOptions};
 use std::os::raw::c_char;
-use std::ffi::{CStr, CString, OsStr, OsString};
-use std::slice;
-use libc;
+
+use c_api_helpers::*;
 
 // sass config options structure
 #[derive(Default, Debug)]
@@ -97,64 +96,13 @@ impl Drop for SassOptions {
 
 // ---------------------------------------------------------------------------------
 
-fn unpack_ptr<'a>(options_ptr: *mut SassOptions) -> &'a mut SassOptions {
+pub fn unpack_ptr<'a>(options_ptr: *mut SassOptions) -> &'a mut SassOptions {
     assert!(!options_ptr.is_null());
 
     unsafe {
         &mut *options_ptr
     }
 }
-
-fn c_char_ptr_to_cstr<'a>(ptr: *const c_char) -> &'a CStr {
-    assert!(!ptr.is_null());
-    unsafe { CStr::from_ptr(ptr) }
-}
-
-fn c_char_ptr_to_cstring(ptr: *const c_char) -> CString {
-    let slice = c_char_ptr_to_cstr(ptr);
-    CString::from(slice)
-}
-
-fn c_char_ptr_to_string(ptr: *const c_char) -> String {
-    let slice = c_char_ptr_to_cstr(ptr);
-    slice.to_string_lossy().into_owned()
-}
-
-fn c_char_ptr_to_vec(ptr: *const c_char) -> Vec<u8> {
-    let s = c_char_ptr_to_cstring(ptr);
-    s.to_bytes().to_vec()
-}
-
-#[cfg(unix)]
-fn c_char_ptr_to_osstring(ptr: *const c_char) -> OsString {
-    use std::os::unix::ffi::OsStrExt;
-
-    let slice = c_char_ptr_to_cstr(ptr);
-    let bytes = slice.to_bytes();
-    OsString::from(OsStr::from_bytes(bytes))
-//    assert!(!ptr.is_null());
-//    let cstr = c_char_ptr_to_cstring(ptr);
-//    let bytes = cstr.into_bytes();
-//    OsString::from_vec(bytes)
-}
-
-#[cfg(windows)]
-fn c_char_ptr_to_osstring(ptr: *const c_char) -> OsString {
-    let bytes = c_char_ptr_to_vec(ptr);
-    OsString::from_vec(bytes)
-}
-
-fn c_char_ptr_to_pathbuf(ptr: *const c_char) -> PathBuf {
-    let osstr = c_char_ptr_to_osstring(ptr);
-    PathBuf::from(osstr)
-}
-
-
-
-
-
-
-
 
 // For debugging.
 #[no_mangle]
