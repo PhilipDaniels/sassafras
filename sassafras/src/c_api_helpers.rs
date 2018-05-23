@@ -2,6 +2,11 @@ use std::path::{Path, PathBuf};
 use std::os::raw::c_char;
 use std::ffi::{CStr, CString, OsStr, OsString};
 
+pub fn ptr_to_ref<'a, T>(options_ptr: *mut T) -> &'a mut T {
+    assert!(!options_ptr.is_null());
+    unsafe { &mut *options_ptr }
+}
+
 pub fn c_char_ptr_to_cstr<'a>(ptr: *const c_char) -> &'a CStr {
     assert!(!ptr.is_null());
     unsafe { CStr::from_ptr(ptr) }

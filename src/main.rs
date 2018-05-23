@@ -93,8 +93,6 @@ struct Arguments {
 }
 
 
-
-
 fn main() {
     let args = Arguments::from_args();
     // The program terminates in the line above if arguments are invalid.
@@ -117,11 +115,13 @@ fn main() {
     }
 
     if let Some(path) = args.include_path {
-        sass_option_push_include_path(options, path);
+        let cstring = path_to_cstring(&path);
+        sass_option_push_include_path(options, cstring.as_ptr());
     }
 
     if let Some(path) = args.plugin_path {
-        sass_option_push_plugin_path(options, path);
+        let cstring = path_to_cstring(&path);
+        sass_option_push_plugin_path(options, cstring.as_ptr());
     }
 
     let mut auto_source_map = false;
@@ -143,9 +143,10 @@ fn main() {
     if !args.from_stdin {
         if generate_source_map {
             if args.output_file.is_some() {
-                let mut src_map_name = args.output_file.clone().unwrap().into_os_string();
+                let mut src_map_name = args.output_file.clone().unwrap();
                 src_map_name.push(".map");
-                sass_option_set_source_map_file(options, PathBuf::from(src_map_name));
+                let cstring = path_to_cstring(&src_map_name);
+                sass_option_set_source_map_file(options, cstring.as_ptr());
             } else {
                 sass_option_set_source_map_embed(options, true);
             }

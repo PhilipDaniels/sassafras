@@ -85,29 +85,39 @@ impl SassOptions {
         self.output_options.indent = "  ".to_string();
         self.output_options.linefeed = "\n".to_string()
     }
+
+    pub fn push_import_extension(&mut self, path: PathBuf) {
+        if !self.extensions.contains(&path) {
+            self.extensions.push(path);
+        }
+    }
+
+    pub fn push_include_path(&mut self, path: PathBuf) {
+        if !self.include_paths.contains(&path) {
+            self.include_paths.push(path);
+        }
+    }
+
+    pub fn push_plugin_path(&mut self, path: PathBuf) {
+        if !self.plugin_paths.contains(&path) {
+            self.plugin_paths.push(path);
+        }
+    }
 }
 
 // For debugging, to show that something is actually dropped.
 impl Drop for SassOptions {
     fn drop(&mut self) {
-        println!("Dropping Sass_Options `{:#?}`!", self);
+        println!("Dropping Sass_Options `{:#?}`", self);
     }
 }
 
 // ---------------------------------------------------------------------------------
 
-pub fn unpack_ptr<'a>(options_ptr: *mut SassOptions) -> &'a mut SassOptions {
-    assert!(!options_ptr.is_null());
-
-    unsafe {
-        &mut *options_ptr
-    }
-}
-
 // For debugging.
 #[no_mangle]
 pub fn sass_option_print(options_ptr: *mut SassOptions) {
-    let options = unpack_ptr(options_ptr);
+    let options = ptr_to_ref(options_ptr);
     println!("{:#?}", options);
 }
 
@@ -135,64 +145,66 @@ pub extern fn sass_delete_options(options_ptr: *mut SassOptions) {
 
 #[no_mangle]
 pub extern fn sass_option_set_precision(options_ptr: *mut SassOptions, precision: u8) {
-    let options = unpack_ptr(options_ptr);
+    let options = ptr_to_ref(options_ptr);
     options.output_options.inspect_options.precision = precision;
 }
 
 #[no_mangle]
 pub extern fn sass_option_set_output_style(options_ptr: *mut SassOptions, output_style: SassOutputStyle) {
-    let options = unpack_ptr(options_ptr);
+    let options = ptr_to_ref(options_ptr);
     options.output_options.inspect_options.output_style = output_style;
 }
 
 #[no_mangle]
 pub extern fn sass_option_push_import_extension(options_ptr: *mut SassOptions, ext: *const c_char) {
-    let options = unpack_ptr(options_ptr);
-    // TODO: These methods that push to these vectors should check for existence and not push if already there.
+    let options = ptr_to_ref(options_ptr);
     let pb = c_char_ptr_to_pathbuf(ext);
-    options.extensions.push(pb);
+    options.push_import_extension(pb);
 }
 
 #[no_mangle]
-pub extern fn sass_option_push_include_path(options_ptr: *mut SassOptions, path: PathBuf) {
-    let options = unpack_ptr(options_ptr);
-    options.include_paths.push(path);
+pub extern fn sass_option_push_include_path(options_ptr: *mut SassOptions, path: *const c_char) {
+    let options = ptr_to_ref(options_ptr);
+    let pb = c_char_ptr_to_pathbuf(path);
+    options.push_include_path(pb);
 }
 
 #[no_mangle]
-pub extern fn sass_option_push_plugin_path(options_ptr: *mut SassOptions, path: PathBuf) {
-    let options = unpack_ptr(options_ptr);
-    options.plugin_paths.push(path);
+pub extern fn sass_option_push_plugin_path(options_ptr: *mut SassOptions, path: *const c_char) {
+    let options = ptr_to_ref(options_ptr);
+    let pb = c_char_ptr_to_pathbuf(path);
+    options.push_plugin_path(pb);
 }
 
 #[no_mangle]
 pub extern fn sass_option_set_source_comments(options_ptr: *mut SassOptions, source_comments: bool) {
-    let options = unpack_ptr(options_ptr);
+    let options = ptr_to_ref(options_ptr);
     options.output_options.source_comments = source_comments;
 }
 
 #[no_mangle]
 pub extern fn sass_option_set_omit_source_map_url(options_ptr: *mut SassOptions, omit_source_map_url: bool) {
-    let options = unpack_ptr(options_ptr);
+    let options = ptr_to_ref(options_ptr);
     options.omit_source_map_url = omit_source_map_url;
 }
 
 #[no_mangle]
 pub extern fn sass_option_set_is_indented_syntax_src(options_ptr: *mut SassOptions, is_indented_syntax_src: bool) {
-    let options = unpack_ptr(options_ptr);
+    let options = ptr_to_ref(options_ptr);
     options.is_indented_syntax_src = is_indented_syntax_src;
 }
 
 #[no_mangle]
 pub extern fn sass_option_set_source_map_embed(options_ptr: *mut SassOptions, is_indented_syntax_src: bool) {
-    let options = unpack_ptr(options_ptr);
+    let options = ptr_to_ref(options_ptr);
     options.source_map_embed = is_indented_syntax_src;
 }
 
 #[no_mangle]
-pub extern fn sass_option_set_source_map_file(options_ptr: *mut SassOptions, source_map_file: PathBuf) {
-    let options = unpack_ptr(options_ptr);
-    options.source_map_file = source_map_file;
+pub extern fn sass_option_set_source_map_file(options_ptr: *mut SassOptions, source_map_file: *const c_char) {
+    let options = ptr_to_ref(options_ptr);
+    let pb = c_char_ptr_to_pathbuf(source_map_file);
+    options.source_map_file = pb;
 }
 
 //
