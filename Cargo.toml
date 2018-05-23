@@ -17,3 +17,6 @@ lto = true
 members = [
     "sassafras"
 ]
+
+[features]
+capi = []

@@ -8,22 +8,22 @@ use c_api_helpers::*;
 #[derive(Default, Debug)]
 #[repr(C)]
 pub struct SassOptions {
-    output_options: SassOutputOptions,
+    pub output_options: SassOutputOptions,
 
     // embed sourceMappingUrl as data uri
-    source_map_embed: bool,
+    pub source_map_embed: bool,
 
     // embed include contents in maps
-    source_map_contents: bool,
+    pub source_map_contents: bool,
 
     // create file urls for sources
-    source_map_file_urls: bool,
+    pub source_map_file_urls: bool,
 
     // Disable sourceMappingUrl in css output
-    omit_source_map_url: bool,
+    pub omit_source_map_url: bool,
 
     // Treat source_string as sass (as opposed to scss)
-    is_indented_syntax_src: bool,
+    pub is_indented_syntax_src: bool,
 
     // The input path is used for source map
     // generation. It can be used to define
@@ -31,20 +31,20 @@ pub struct SassOptions {
     // overload the input file path. It is
     // set to "stdin" for data contexts and
     // to the input file on file contexts.
-    input_path: PathBuf,
+    pub input_path: PathBuf,
 
     // The output path is used for source map
     // generation. LibSass will not write to
     // this file, it is just used to create
     // information in source-maps etc.
-    output_path: PathBuf,
+    pub output_path: PathBuf,
 
     // Colon-separated list of paths
     // Semicolon-separated on Windows
     // Maybe use array interface instead?
-    extension: String,
-    include_path: PathBuf,
-    plugin_path: PathBuf,
+    pub extension: String,
+    pub include_path: PathBuf,
+    pub plugin_path: PathBuf,
 
     // Extensions (linked string list)
     extensions: Vec<PathBuf>,
@@ -58,10 +58,10 @@ pub struct SassOptions {
     // Path to source map file
     // Enables source map generation
     // Used to create sourceMappingUrl
-    source_map_file: PathBuf,
+    pub source_map_file: PathBuf,
 
     // Directly inserted in source maps
-    source_map_root: String,
+    pub source_map_root: String,
 
     // Custom functions that can be called from sccs code
     //c_functions: Sass_Function_List,
@@ -86,19 +86,22 @@ impl SassOptions {
         self.output_options.linefeed = "\n".to_string()
     }
 
-    pub fn push_import_extension(&mut self, path: PathBuf) {
+    pub fn push_import_extension<P: Into<PathBuf>>(&mut self, path: P) {
+        let path = path.into();
         if !self.extensions.contains(&path) {
             self.extensions.push(path);
         }
     }
 
-    pub fn push_include_path(&mut self, path: PathBuf) {
+    pub fn push_include_path<P: Into<PathBuf>>(&mut self, path: P) {
+        let path = path.into();
         if !self.include_paths.contains(&path) {
             self.include_paths.push(path);
         }
     }
 
-    pub fn push_plugin_path(&mut self, path: PathBuf) {
+    pub fn push_plugin_path<P: Into<PathBuf>>(&mut self, path: P) {
+        let path = path.into();
         if !self.plugin_paths.contains(&path) {
             self.plugin_paths.push(path);
         }

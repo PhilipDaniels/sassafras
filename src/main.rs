@@ -2,21 +2,21 @@
 extern crate built;
 #[macro_use]
 extern crate clap;
+extern crate core;
+extern crate sassafras;
 #[macro_use]
 extern crate structopt;
-extern crate sassafras;
-extern crate core;
 
-use structopt::StructOpt;
-use std::path::PathBuf;
+use sassafras::c_api_helpers::path_to_cstring;
 use sassafras::sass_options::*;
 use sassafras::sass_output_options::SassOutputStyle;
-use std::path::Path;
-use std::os::raw::c_char;
-use std::ffi::OsString;
 use std::ffi::CString;
+use std::ffi::OsString;
+use std::os::raw::c_char;
 use std::panic;
-use sassafras::c_api_helpers::path_to_cstring;
+use std::path::Path;
+use std::path::PathBuf;
+use structopt::StructOpt;
 
 // TODO: Both of these enums cause a warning to be emitted.
 
@@ -94,15 +94,81 @@ struct Arguments {
 
 
 fn main() {
+    //c_inner_main();
+    rust_inner_main();
+}
+
+fn rust_inner_main() {
     let args = Arguments::from_args();
     // The program terminates in the line above if arguments are invalid.
 
-    // sassc uses the C API to drive libsass.
-    // For the sake of testing and porting, we will do the same for now,
-    // so this is not idiomatic Rust.
+    let mut options = SassOptions::new();
+    options.output_options.inspect_options.output_style = translate_output_style(args.output_style);
+    options.output_options.source_comments = args.line_numbers;
+    options.omit_source_map_url = args.omit_sourcemap_comment;
+    options.output_options.inspect_options.precision = args.precision;
+    options.is_indented_syntax_src = args.input_is_indented;
+
+    if let Some(ext) = args.import_extension {
+        options.push_import_extension(ext);
+    }
+
+    if let Some(path) = args.include_path {
+        options.push_include_path(path);
+    }
+
+    if let Some(path) = args.plugin_path {
+        options.push_plugin_path(path);
+    }
+
+    let mut auto_source_map = false;
+    let mut generate_source_map = false;
+
+    match args.emit_sourcemap {
+        SourceMapEmission::Auto => {
+            auto_source_map = true;
+            generate_source_map = true
+        }
+        SourceMapEmission::Inline => {
+            options.source_map_embed = true;
+            generate_source_map = true
+        }
+        SourceMapEmission::No => {}
+    }
+
+    let mut result = 0;
+    if !args.from_stdin {
+        if generate_source_map {
+            if args.output_file.is_some() {
+                let mut src_map_name = args.output_file.clone().unwrap();
+                src_map_name.push(".map");
+                options.source_map_file = src_map_name;
+            } else {
+                options.source_map_embed = true;
+            }
+        } else {
+            options.source_map_embed = true;
+        }
+
+        // If output_file is None, we write to stdout.
+        // result = c_compile_file(options, args.input_file, args.output_file);
+    } else {
+        // If output_file is None, we write to stdout.
+        //result = c_compile_stdin(options, args.output_file);
+    }
+
+    println!("{:#?}", options);
+
+    // options is automatically dropped at the end of the function.
+}
+
+/// sassc uses the C API to drive libsass.
+/// For the sake of testing and porting, we will do the same for now.
+/// #[cfg(capi)]
+fn c_inner_main() {
+    let args = Arguments::from_args();
+    // The program terminates in the line above if arguments are invalid.
     let options = sass_make_options();
-    sass_option_set_output_style(options, SassOutputStyle::Nested);
-    sass_option_set_precision(options, 5);
     sass_option_set_output_style(options, translate_output_style(args.output_style));
     sass_option_set_source_comments(options, args.line_numbers);
     sass_option_set_omit_source_map_url(options, args.omit_sourcemap_comment);
@@ -155,27 +221,17 @@ fn main() {
         }
 
         // If output_file is None, we write to stdout.
-        result = compile_file(options, args.input_file, args.output_file);
+        result = c_compile_file(options, args.input_file, args.output_file);
     } else {
         // If output_file is None, we write to stdout.
-        result = compile_stdin(options, args.output_file);
+        result = c_compile_stdin(options, args.output_file);
     }
 
     sass_option_print(options);
     sass_delete_options(options);
 }
 
-fn translate_output_style(arg_style: OutputStyles) -> SassOutputStyle {
-    match arg_style {
-        OutputStyles::Compressed => SassOutputStyle::Compressed,
-        OutputStyles::Compact => SassOutputStyle::Compact,
-        OutputStyles::Expanded => SassOutputStyle::Expanded,
-        OutputStyles::Nested => SassOutputStyle::Nested
-    }
-}
-
-
-pub fn compile_file(options_ptr: *mut SassOptions, input_file: Option<PathBuf>, output_file: Option<PathBuf>) -> i32 {
+fn c_compile_file(options_ptr: *mut SassOptions, input_file: Option<PathBuf>, output_file: Option<PathBuf>) -> i32 {
 //    int ret;
 //    struct Sass_File_Context* ctx = sass_make_file_context(input_path);
 //    struct Sass_Context* ctx_out = sass_file_context_get_context(ctx);
@@ -204,11 +260,10 @@ pub fn compile_file(options_ptr: *mut SassOptions, input_file: Option<PathBuf>, 
 //
 //    sass_delete_file_context(ctx);
 //    return ret;
-
     0
 }
 
-pub fn compile_stdin(options_ptr: *mut SassOptions, output_file: Option<PathBuf>) -> i32 {
+fn c_compile_stdin(options_ptr: *mut SassOptions, output_file: Option<PathBuf>) -> i32 {
 //    int ret;
 //    struct Sass_Data_Context* ctx;
 //    char buffer[BUFSIZE];
@@ -268,7 +323,7 @@ pub fn compile_stdin(options_ptr: *mut SassOptions, output_file: Option<PathBuf>
     0
 }
 
-fn output() -> i32 {
+fn c_output() -> i32 {
 //    if (error_status) {
 //        if (error_message) {
 //            fprintf(stderr, "%s", error_message);
@@ -303,4 +358,13 @@ fn output() -> i32 {
 //    }
 
     0
+}
+
+fn translate_output_style(arg_style: OutputStyles) -> SassOutputStyle {
+    match arg_style {
+        OutputStyles::Compressed => SassOutputStyle::Compressed,
+        OutputStyles::Compact => SassOutputStyle::Compact,
+        OutputStyles::Expanded => SassOutputStyle::Expanded,
+        OutputStyles::Nested => SassOutputStyle::Nested
+    }
 }
