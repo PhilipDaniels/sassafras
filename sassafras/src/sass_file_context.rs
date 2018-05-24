@@ -37,19 +37,20 @@ pub extern fn sass_make_file_context(input_path: *const c_char) -> *mut SassFile
     // SharedObj::setTaint(true); // needed for static colors
     let pb = c_char_ptr_to_pathbuf(input_path);
     let mut ctx = SassFileContext::new(pb);
-    heapify(ctx)
+    box_to_raw_ptr(ctx)
 }
 
 //// Call the compilation step for the specific context
 //ADDAPI int ADDCALL sass_compile_file_context (struct Sass_File_Context* ctx);
+
 //// Create a sass compiler instance for more control
 //ADDAPI struct Sass_Compiler* ADDCALL sass_make_file_compiler (struct Sass_File_Context* file_ctx);
-//
 
-//// Release all memory allocated and also ourself
-//ADDAPI void ADDCALL sass_delete_file_context (struct Sass_File_Context* ctx);
-//
-//// Getters for context from specific implementation
+#[no_mangle]
+pub extern fn sass_delete_file_context(ptr: *mut SassFileContext) {
+    drop_raw_ptr(ptr);
+}
+
 //ADDAPI struct Sass_Context* ADDCALL sass_file_context_get_context (struct Sass_File_Context* file_ctx);
 //ADDAPI struct Sass_Options* ADDCALL sass_file_context_get_options (struct Sass_File_Context* file_ctx);
 //ADDAPI void ADDCALL sass_file_context_set_options (struct Sass_File_Context* file_ctx, struct Sass_Options* opt);

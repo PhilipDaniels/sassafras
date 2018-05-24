@@ -129,18 +129,12 @@ pub fn sass_option_print(options_ptr: *mut SassOptions) {
 #[no_mangle]
 pub extern fn sass_make_options() -> *mut SassOptions {
     let mut options = SassOptions::new();
-    heapify(options)
+    box_to_raw_ptr(options)
 }
 
 #[no_mangle]
 pub extern fn sass_delete_options(options_ptr: *mut SassOptions) {
-    if !options_ptr.is_null() {
-        unsafe {
-            // from_raw() constructs a box, which is then automatically dropped
-            // at the end of the scope, calling drop() on the struct.
-            Box::from_raw(options_ptr);
-        }
-    }
+    drop_raw_ptr(options_ptr);
 }
 
 #[no_mangle]
