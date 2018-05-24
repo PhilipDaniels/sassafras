@@ -76,3 +76,14 @@ pub fn path_to_cstring(path: &Path) -> CString {
         None => panic!("Could not convert path to cstring")
     }
 }
+
+
+/* Can't do this unfortunately, both types are not in this crate!
+   Could workaround this using the newtype pattern.
+impl From<* const c_char> for PathBuf {
+    fn from(ptr: *const c_char) -> Self {
+        let osstr = c_char_ptr_to_osstring(ptr);
+        PathBuf::from(osstr)
+    }
+}
+*/
