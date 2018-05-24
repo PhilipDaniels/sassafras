@@ -1,15 +1,44 @@
 use sass_context::SassContext;
+use std::os::raw::c_char;
+use sass_context::SassInputStyle;
+use c_api_helpers::*;
+use std::path::PathBuf;
 
 // struct for file compilation
+#[derive(Default)]
 #[repr(C)]
 pub struct SassFileContext {
-    context: SassContext
+    pub context: SassContext
     // no additional fields required
     // input_path is already on options
 }
 
-//// Create and initialize a specific context
-//ADDAPI struct Sass_File_Context* ADDCALL sass_make_file_context (const char* input_path);
+impl SassFileContext {
+    pub fn new<P: Into<PathBuf>>(input_path: P) -> Self {
+        let mut ctx = SassFileContext::default();
+        // ctx->type = SASS_CONTEXT_FILE;
+        ctx.context.context_type = SassInputStyle::File;
+        ctx.context.options.init();
+
+        ctx.context.options.input_path = input_path.into();
+        // try {
+        //     if (input_path == 0) { throw(std::runtime_error("File context created without an input path")); }
+        //     if (*input_path == 0) { throw(std::runtime_error("File context created with empty input path")); }
+        //     sass_option_set_input_path(ctx, input_path);
+        // } catch (...) {
+        //    handle_errors(ctx);
+        // }
+        ctx
+    }
+}
+
+#[no_mangle]
+pub extern fn sass_make_file_context(input_path: *const c_char) -> *mut SassFileContext {
+    // SharedObj::setTaint(true); // needed for static colors
+    let pb = c_char_ptr_to_pathbuf(input_path);
+    let mut ctx = SassFileContext::new(pb);
+    heapify(ctx)
+}
 
 //// Call the compilation step for the specific context
 //ADDAPI int ADDCALL sass_compile_file_context (struct Sass_File_Context* ctx);

@@ -1,7 +1,6 @@
 use std::path::PathBuf;
 use sass_output_options::{SassOutputStyle, SassOutputOptions};
 use std::os::raw::c_char;
-
 use c_api_helpers::*;
 
 // sass config options structure
@@ -130,9 +129,7 @@ pub fn sass_option_print(options_ptr: *mut SassOptions) {
 #[no_mangle]
 pub extern fn sass_make_options() -> *mut SassOptions {
     let mut options = SassOptions::new();
-    // Box::new() places the options struct onto the heap, then
-    // into_raw() ensures it is not cleaned up.
-    Box::into_raw(Box::new(options))
+    heapify(options)
 }
 
 #[no_mangle]

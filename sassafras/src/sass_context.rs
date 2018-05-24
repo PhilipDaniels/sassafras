@@ -11,30 +11,37 @@ pub enum SassInputStyle {
     Folder,
 }
 
+impl Default for SassInputStyle {
+    fn default() -> Self {
+        SassInputStyle::Null
+    }
+}
+
 // base for all contexts
+#[derive(Default)]
 pub struct SassContext {
-    options: SassOptions,
+    pub options: SassOptions,
     // store context type info
-    context_type: SassInputStyle,
+    pub context_type: SassInputStyle,
     // generated output data
-    output_string: String,
+    pub output_string: String,
     // generated source map json
-    source_map_string: String,
+    pub source_map_string: String,
 
     // error status
-    error_status: i32,
-    error_json: String,
-    error_text: String,
-    error_message: String,
+    pub error_status: i32,
+    pub error_json: String,
+    pub error_text: String,
+    pub error_message: String,
 
     // error position
-    error_file: PathBuf,
-    error_line: usize,
-    error_column: usize,
-    error_src: String,
+    pub error_file: PathBuf,
+    pub error_line: usize,
+    pub error_column: usize,
+    pub error_src: String,
 
     // report imported files
-    included_files: Vec<PathBuf>,
+    pub included_files: Vec<PathBuf>,
 }
 
 //// Getters for Sass_Context values

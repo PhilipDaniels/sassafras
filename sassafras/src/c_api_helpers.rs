@@ -7,6 +7,11 @@ pub fn ptr_to_ref<'a, T>(options_ptr: *mut T) -> &'a mut T {
     unsafe { &mut *options_ptr }
 }
 
+pub fn heapify<T>(value: T) -> *mut T {
+    // Box::new() places the struct onto the heap, then into_raw() ensures it is not cleaned up.
+    Box::into_raw(Box::new(value))
+}
+
 pub fn c_char_ptr_to_cstr<'a>(ptr: *const c_char) -> &'a CStr {
     assert!(!ptr.is_null());
     unsafe { CStr::from_ptr(ptr) }
