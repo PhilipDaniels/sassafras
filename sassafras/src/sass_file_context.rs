@@ -51,6 +51,12 @@ pub extern fn sass_delete_file_context(ptr: *mut SassFileContext) {
     drop_raw_ptr(ptr);
 }
 
-//ADDAPI struct Sass_Context* ADDCALL sass_file_context_get_context (struct Sass_File_Context* file_ctx);
+#[no_mangle]
+pub extern fn sass_file_context_get_context (file_ctx: *mut SassFileContext) -> *mut SassContext
+{
+    let mut ctx = ptr_to_ref(file_ctx);
+    &mut ctx.context
+}
+
 //ADDAPI struct Sass_Options* ADDCALL sass_file_context_get_options (struct Sass_File_Context* file_ctx);
 //ADDAPI void ADDCALL sass_file_context_set_options (struct Sass_File_Context* file_ctx, struct Sass_Options* opt);

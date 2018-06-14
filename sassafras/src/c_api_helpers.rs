@@ -2,9 +2,9 @@ use std::path::{Path, PathBuf};
 use std::os::raw::c_char;
 use std::ffi::{CStr, CString, OsStr, OsString};
 
-pub fn ptr_to_ref<'a, T>(options_ptr: *mut T) -> &'a mut T {
-    assert!(!options_ptr.is_null());
-    unsafe { &mut *options_ptr }
+pub fn ptr_to_ref<'a, T>(ptr: *mut T) -> &'a mut T {
+    assert!(!ptr.is_null());
+    unsafe { &mut *ptr }
 }
 
 pub fn box_to_raw_ptr<T>(value: T) -> *mut T {
@@ -22,44 +22,74 @@ pub fn drop_raw_ptr<T>(ptr: *mut T) {
     }
 }
 
+/// Converts a C string pointer into a slice. The slice is expected to have the
+/// trailing nul byte (you will get a runtime error if it doesn't).
+/// Currently calls strlen() on the string.
 pub fn c_char_ptr_to_cstr<'a>(ptr: *const c_char) -> &'a CStr {
     assert!(!ptr.is_null());
     unsafe { CStr::from_ptr(ptr) }
 }
 
+/// Converts a C string pointer into an owned CString, including a trailing nul byte.
 pub fn c_char_ptr_to_cstring(ptr: *const c_char) -> CString {
     let slice = c_char_ptr_to_cstr(ptr);
     CString::from(slice)
 }
 
-pub fn c_char_ptr_to_string(ptr: *const c_char) -> String {
-    let slice = c_char_ptr_to_cstr(ptr);
-    slice.to_string_lossy().into_owned()
+/// Converts a C string pointer to a byte slice including a trailing nul byte.
+pub fn c_char_ptr_to_bytes_with_nul<'a>(ptr: *const c_char) -> &'a [u8] {
+    let s = c_char_ptr_to_cstr(ptr);
+    s.to_bytes_with_nul()
 }
 
+/// Converts a C string pointer to a vector, including a trailing nul byte.
 pub fn c_char_ptr_to_vec(ptr: *const c_char) -> Vec<u8> {
-    let s = c_char_ptr_to_cstring(ptr);
-    s.to_bytes().to_vec()
+    let s = c_char_ptr_to_bytes_with_nul(ptr);
+    s.to_vec()
 }
 
+/// Converts a C string pointer to an OsString, including a trailing nul byte.
 #[cfg(unix)]
 fn c_char_ptr_to_osstring(ptr: *const c_char) -> OsString {
     use std::os::unix::ffi::OsStrExt;
 
-    let slice = c_char_ptr_to_cstr(ptr);
-    let bytes = slice.to_bytes();
+    //let slice = c_char_ptr_to_cstr(ptr);
+    let bytes = c_char_ptr_to_bytes_with_nul(ptr);
     OsString::from(OsStr::from_bytes(bytes))
 }
 
+/// Converts a C string pointer to an OsString, including a trailing nul byte.
 #[cfg(windows)]
 pub fn c_char_ptr_to_osstring(ptr: *const c_char) -> OsString {
     let bytes = c_char_ptr_to_vec(ptr);
     OsString::from_vec(bytes)
 }
 
+/// Converts a C string pointer to a PathBuf. The PathBuf should have a trailing nul byte.
 pub fn c_char_ptr_to_pathbuf(ptr: *const c_char) -> PathBuf {
     let osstr = c_char_ptr_to_osstring(ptr);
     PathBuf::from(osstr)
+}
+
+/// Converts a path to a C string pointer by getting a pointer to the inner OsString buffer.
+pub fn path_to_c_char_ptr<P: AsRef<Path>>(path: P) -> *const c_char {
+    let path = path.as_ref();
+    let os_str = path.as_os_str();
+    unsafe { os_str as *const OsStr as *const c_char }
+}
+
+
+
+
+
+
+
+
+// Unknown below here.
+
+pub fn c_char_ptr_to_string(ptr: *const c_char) -> String {
+    let slice = c_char_ptr_to_cstr(ptr);
+    slice.to_string_lossy().into_owned()
 }
 
 #[cfg(unix)]
@@ -86,4 +116,4 @@ impl From<* const c_char> for PathBuf {
         PathBuf::from(osstr)
     }
 }
-*/
+.*/

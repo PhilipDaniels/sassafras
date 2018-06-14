@@ -17,6 +17,7 @@ use std::panic;
 use std::path::Path;
 use std::path::PathBuf;
 use structopt::StructOpt;
+use sassafras::sass_file_context::*;
 
 // TODO: Both of these enums cause a warning to be emitted.
 
@@ -92,10 +93,10 @@ struct Arguments {
     output_file: Option<PathBuf>,
 }
 
-
+// Example usage: cargo run -- -m=auto AA BB.x
 fn main() {
-    //c_inner_main();
-    rust_inner_main();
+    c_inner_main();
+    //rust_inner_main();
 }
 
 fn rust_inner_main() {
@@ -141,7 +142,7 @@ fn rust_inner_main() {
         if generate_source_map {
             if args.output_file.is_some() {
                 let mut src_map_name = args.output_file.clone().unwrap();
-                src_map_name.push(".map");
+                extend_extension(&mut src_map_name, "map");
                 options.source_map_file = src_map_name;
             } else {
                 options.source_map_embed = true;
@@ -210,7 +211,7 @@ fn c_inner_main() {
         if generate_source_map {
             if args.output_file.is_some() {
                 let mut src_map_name = args.output_file.clone().unwrap();
-                src_map_name.push(".map");
+                extend_extension(&mut src_map_name, "map");
                 let cstring = path_to_cstring(&src_map_name);
                 sass_option_set_source_map_file(options, cstring.as_ptr());
             } else {
@@ -231,12 +232,17 @@ fn c_inner_main() {
     sass_delete_options(options);
 }
 
-fn c_compile_file(options_ptr: *mut SassOptions, input_file: Option<PathBuf>, output_file: Option<PathBuf>) -> i32 {
+fn c_compile_file(options: *mut SassOptions, input_file: Option<PathBuf>, output_file: Option<PathBuf>) -> i32 {
 //    int ret;
-//    struct Sass_File_Context* ctx = sass_make_file_context(input_path);
-//    struct Sass_Context* ctx_out = sass_file_context_get_context(ctx);
-//    if (outfile) sass_option_set_output_path(options, outfile);
-//    const char* srcmap_file = sass_option_get_source_map_file(options);
+    let input_path = path_to_cstring(&input_file.unwrap());
+    let ctx = sass_make_file_context(input_path.as_ptr());
+    let ctx_out = sass_file_context_get_context(ctx);
+    if let Some(outfile) = output_file {
+        let cstring = path_to_cstring(&outfile);
+        sass_option_set_output_path(options, cstring.as_ptr());
+    }
+
+    let srcmap_file = sass_option_get_source_map_file(options);
 //    sass_option_set_input_path(options, input_path);
 //    sass_file_context_set_options(ctx, options);
 //
@@ -367,4 +373,18 @@ fn translate_output_style(arg_style: OutputStyles) -> SassOutputStyle {
         OutputStyles::Expanded => SassOutputStyle::Expanded,
         OutputStyles::Nested => SassOutputStyle::Nested
     }
+}
+
+pub fn extend_extension(path: &mut PathBuf, extension: &str) {
+    let new_extension = match path.extension() {
+        None => OsString::from(extension),
+        Some(existing_extension) => {
+            let mut e = existing_extension.to_os_string();
+            e.push(".");
+            e.push(extension);
+            e
+        }
+    };
+
+    path.set_extension(new_extension);
 }

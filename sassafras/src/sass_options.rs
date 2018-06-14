@@ -2,6 +2,7 @@ use std::path::PathBuf;
 use sass_output_options::{SassOutputStyle, SassOutputOptions};
 use std::os::raw::c_char;
 use c_api_helpers::*;
+use std::ffi::OsStr;
 
 // sass config options structure
 #[derive(Default, Debug)]
@@ -201,33 +202,52 @@ pub extern fn sass_option_set_source_map_file(options_ptr: *mut SassOptions, sou
     options.source_map_file = pb;
 }
 
-//
+
 //// Getters for Context_Option values
 //ADDAPI int ADDCALL sass_option_get_precision (struct Sass_Options* options);
 //ADDAPI enum Sass_Output_Style ADDCALL sass_option_get_output_style (struct Sass_Options* options);
 //ADDAPI bool ADDCALL sass_option_get_source_comments (struct Sass_Options* options);
 //ADDAPI bool ADDCALL sass_option_get_source_map_embed (struct Sass_Options* options);
 //ADDAPI bool ADDCALL sass_option_get_source_map_contents (struct Sass_Options* options);
-//ADDAPI bool ADDCALL sass_option_get_source_map_file_urls (struct Sass_Options* options);
+#[no_mangle]
+pub extern fn sass_option_get_source_map_file_urls(options_ptr: *mut SassOptions)
+{
+
+}
+
 //ADDAPI bool ADDCALL sass_option_get_omit_source_map_url (struct Sass_Options* options);
 //ADDAPI bool ADDCALL sass_option_get_is_indented_syntax_src (struct Sass_Options* options);
 //ADDAPI const char* ADDCALL sass_option_get_indent (struct Sass_Options* options);
 //ADDAPI const char* ADDCALL sass_option_get_linefeed (struct Sass_Options* options);
 //ADDAPI const char* ADDCALL sass_option_get_input_path (struct Sass_Options* options);
 //ADDAPI const char* ADDCALL sass_option_get_output_path (struct Sass_Options* options);
-//ADDAPI const char* ADDCALL sass_option_get_source_map_file (struct Sass_Options* options);
+pub extern fn sass_option_get_source_map_file(options_ptr: *mut SassOptions) -> *const c_char {
+    let options = ptr_to_ref(options_ptr);
+    //let smf_path_buf = &options.source_map_file;
+    //let os_str = smf_path_buf.as_os_str();  // returns &OsStr
+    //unsafe { os_str as *const OsStr as *const c_char }
+    path_to_c_char_ptr(&options.source_map_file)
+}
+
 //ADDAPI const char* ADDCALL sass_option_get_source_map_root (struct Sass_Options* options);
 //ADDAPI Sass_Importer_List ADDCALL sass_option_get_c_headers (struct Sass_Options* options);
 //ADDAPI Sass_Importer_List ADDCALL sass_option_get_c_importers (struct Sass_Options* options);
 //ADDAPI Sass_Function_List ADDCALL sass_option_get_c_functions (struct Sass_Options* options);
-//
+
 //// Setters for Context_Option values
 //ADDAPI void ADDCALL sass_option_set_source_map_contents (struct Sass_Options* options, bool source_map_contents);
 //ADDAPI void ADDCALL sass_option_set_source_map_file_urls (struct Sass_Options* options, bool source_map_file_urls);
 //ADDAPI void ADDCALL sass_option_set_indent (struct Sass_Options* options, const char* indent);
 //ADDAPI void ADDCALL sass_option_set_linefeed (struct Sass_Options* options, const char* linefeed);
 //ADDAPI void ADDCALL sass_option_set_input_path (struct Sass_Options* options, const char* input_path);
-//ADDAPI void ADDCALL sass_option_set_output_path (struct Sass_Options* options, const char* output_path);
+
+#[no_mangle]
+pub extern fn sass_option_set_output_path (options_ptr: *mut SassOptions, output_path: *const c_char) {
+    let options = ptr_to_ref(options_ptr);
+    let pb = c_char_ptr_to_pathbuf(output_path);
+    options.output_path = pb;
+}
+
 //ADDAPI void ADDCALL sass_option_set_plugin_path (struct Sass_Options* options, const char* plugin_path);
 //ADDAPI void ADDCALL sass_option_set_include_path (struct Sass_Options* options, const char* include_path);
 //ADDAPI void ADDCALL sass_option_set_source_map_root (struct Sass_Options* options, const char* source_map_root);
@@ -235,10 +255,19 @@ pub extern fn sass_option_set_source_map_file(options_ptr: *mut SassOptions, sou
 //ADDAPI void ADDCALL sass_option_set_c_importers (struct Sass_Options* options, Sass_Importer_List c_importers);
 //ADDAPI void ADDCALL sass_option_set_c_functions (struct Sass_Options* options, Sass_Function_List c_functions);
 
-//// Getters for options include path array
-//ADDAPI size_t ADDCALL sass_option_get_include_path_size(struct Sass_Options* options);
-//ADDAPI const char* ADDCALL sass_option_get_include_path(struct Sass_Options* options, size_t i);
+#[no_mangle]
+pub extern fn sass_option_get_include_path_size(options_ptr: *mut SassOptions) -> usize {
+    let options = ptr_to_ref(options_ptr);
+    options.include_paths.len()
+}
 
+/// Returns a non-owning pointer to a path.
+#[no_mangle]
+pub extern fn sass_option_get_include_path(options_ptr: *mut SassOptions, i: usize) -> usize {
+    let options = ptr_to_ref(options_ptr);
+    let p = &options.include_paths[i];
+    i
+}
 
 //// Resolve a file via the given include paths in the sass option struct
 //// find_file looks for the exact file name while find_include does a regular sass include
