@@ -1,6 +1,8 @@
 use sass_context::SassContext;
+use c_api_helpers::ptr_to_ref;
 
 // Compiler states
+#[derive(Debug)]
 #[repr(C)]
 pub enum SassCompilerState {
     Created,
@@ -9,6 +11,7 @@ pub enum SassCompilerState {
 }
 
 // link c and cpp context
+#[derive(Debug)]
 #[repr(C)]
 pub struct SassCompiler {
     // progress status
@@ -21,6 +24,11 @@ pub struct SassCompiler {
     //root: Block_Obj
 }
 
+#[no_mangle]
+pub fn sass_compiler_print(msg: &str, ctx: *mut SassCompiler) {
+    let context = ptr_to_ref(ctx);
+    println!("{}{:#?}", msg, context);
+}
 
 //
 //// Resolve a file relative to last import or include paths in the sass option struct

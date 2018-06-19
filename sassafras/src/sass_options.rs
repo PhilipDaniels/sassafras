@@ -114,13 +114,10 @@ impl Drop for SassOptions {
     }
 }
 
-// ---------------------------------------------------------------------------------
-
-// For debugging.
 #[no_mangle]
-pub fn sass_option_print(options_ptr: *mut SassOptions) {
-    let options = ptr_to_ref(options_ptr);
-    println!("{:#?}", options);
+pub fn sass_options_print(msg: &str, ctx: *mut SassOptions) {
+    let context = ptr_to_ref(ctx);
+    println!("{}{:#?}", msg, context);
 }
 
 // ---------------------------------------------------------------------------------

@@ -244,11 +244,9 @@ fn c_compile_file(options: *mut SassOptions, input_file: Option<PathBuf>, output
 
     let srcmap_file = sass_option_get_source_map_file(options);
     sass_option_set_input_path(options, input_path.as_ptr());
-    println!("Dump1 of sass_file_context_print");
-    sass_file_context_print(ctx);
+    sass_file_context_print("before sass_file_context_set_options>>\n", ctx);
     sass_file_context_set_options(ctx, options);
-    println!("Dump2 of sass_file_context_print");
-    sass_file_context_print(ctx);
+    sass_file_context_print("after sass_file_context_set_options>>\n", ctx);
 
 //    sass_compile_file_context(ctx);
 //

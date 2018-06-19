@@ -1,4 +1,5 @@
 use sass_inspect_options::SassInspectOptions;
+use c_api_helpers::ptr_to_ref;
 
 // Different render styles
 #[derive(Debug)]
@@ -57,4 +58,10 @@ impl SassOutputOptions {
             source_comments
         }
     }
+}
+
+#[no_mangle]
+pub fn sass_output_options_print(msg: &str, ctx: *mut SassOutputOptions) {
+    let context = ptr_to_ref(ctx);
+    println!("{}{:#?}", msg, context);
 }

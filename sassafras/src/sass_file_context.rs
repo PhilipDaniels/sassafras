@@ -34,11 +34,10 @@ impl SassFileContext {
 }
 
 #[no_mangle]
-pub fn sass_file_context_print(ctx: *mut SassFileContext) {
+pub fn sass_file_context_print(msg: &str, ctx: *mut SassFileContext) {
     let context = ptr_to_ref(ctx);
-    println!("{:#?}", context);
+    println!("{}{:#?}", msg, context);
 }
-
 
 #[no_mangle]
 pub extern fn sass_make_file_context(input_path: *const c_char) -> *mut SassFileContext {

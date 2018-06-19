@@ -1,4 +1,5 @@
 use sass_output_options::SassOutputStyle;
+use c_api_helpers::ptr_to_ref;
 
 // sass config options structure
 #[derive(Default, Debug)]
@@ -16,4 +17,10 @@ impl SassInspectOptions {
     pub fn new(style: SassOutputStyle, precision: u8) -> Self {
         SassInspectOptions { output_style: style, precision }
     }
+}
+
+#[no_mangle]
+pub fn sass_inspect_options_print(msg: &str, ctx: *mut SassInspectOptions) {
+    let context = ptr_to_ref(ctx);
+    println!("{}{:#?}", msg, context);
 }

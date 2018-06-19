@@ -1,5 +1,6 @@
 use sass_options::SassOptions;
 use std::path::PathBuf;
+use c_api_helpers::ptr_to_ref;
 
 // input behaviours
 #[derive(Debug)]
@@ -43,6 +44,13 @@ pub struct SassContext {
     // report imported files
     pub included_files: Vec<PathBuf>,
 }
+
+#[no_mangle]
+pub fn sass_context_print(msg: &str, ctx: *mut SassContext) {
+    let context = ptr_to_ref(ctx);
+    println!("{}{:#?}", msg, context);
+}
+
 
 //// Getters for Sass_Context values
 //ADDAPI const char* ADDCALL sass_context_get_output_string (struct Sass_Context* ctx);
