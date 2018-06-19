@@ -3,9 +3,10 @@ use std::os::raw::c_char;
 use sass_context::SassInputStyle;
 use c_api_helpers::*;
 use std::path::PathBuf;
+use sass_options::SassOptions;
 
 // struct for file compilation
-#[derive(Default)]
+#[derive(Default, Debug)]
 #[repr(C)]
 pub struct SassFileContext {
     pub context: SassContext
@@ -33,10 +34,17 @@ impl SassFileContext {
 }
 
 #[no_mangle]
+pub fn sass_file_context_print(ctx: *mut SassFileContext) {
+    let context = ptr_to_ref(ctx);
+    println!("{:#?}", context);
+}
+
+
+#[no_mangle]
 pub extern fn sass_make_file_context(input_path: *const c_char) -> *mut SassFileContext {
     // SharedObj::setTaint(true); // needed for static colors
     let pb = c_char_ptr_to_pathbuf(input_path);
-    let mut ctx = SassFileContext::new(pb);
+    let ctx = SassFileContext::new(pb);
     box_to_raw_ptr(ctx)
 }
 
@@ -52,11 +60,15 @@ pub extern fn sass_delete_file_context(ptr: *mut SassFileContext) {
 }
 
 #[no_mangle]
-pub extern fn sass_file_context_get_context (file_ctx: *mut SassFileContext) -> *mut SassContext
-{
-    let mut ctx = ptr_to_ref(file_ctx);
+pub extern fn sass_file_context_get_context(file_ctx: *mut SassFileContext) -> *mut SassContext {
+    let ctx = ptr_to_ref(file_ctx);
     &mut ctx.context
 }
 
-//ADDAPI struct Sass_Options* ADDCALL sass_file_context_get_options (struct Sass_File_Context* file_ctx);
-//ADDAPI void ADDCALL sass_file_context_set_options (struct Sass_File_Context* file_ctx, struct Sass_Options* opt);
+//ADDAPI struct Sass_Options* ADDCALL sass_file_context_get_options(struct Sass_File_Context* file_ctx);
+
+#[no_mangle]
+pub extern fn sass_file_context_set_options(file_ctx: *mut SassFileContext, options: *mut SassOptions) {
+    let ctx = ptr_to_ref(file_ctx);
+    ctx.context.options = ptr_to(options);
+}

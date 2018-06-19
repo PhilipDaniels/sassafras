@@ -93,7 +93,7 @@ struct Arguments {
     output_file: Option<PathBuf>,
 }
 
-// Example usage: cargo run -- -m=auto AA BB.x
+// Example usage: cargo run -- -m=auto -p=6 -t=Compact INFILE.sass OUTFILE.css
 fn main() {
     c_inner_main();
     //rust_inner_main();
@@ -228,7 +228,7 @@ fn c_inner_main() {
         result = c_compile_stdin(options, args.output_file);
     }
 
-    sass_option_print(options);
+    //sass_option_print(options);
     sass_delete_options(options);
 }
 
@@ -243,9 +243,13 @@ fn c_compile_file(options: *mut SassOptions, input_file: Option<PathBuf>, output
     }
 
     let srcmap_file = sass_option_get_source_map_file(options);
-//    sass_option_set_input_path(options, input_path);
-//    sass_file_context_set_options(ctx, options);
-//
+    sass_option_set_input_path(options, input_path.as_ptr());
+    println!("Dump1 of sass_file_context_print");
+    sass_file_context_print(ctx);
+    sass_file_context_set_options(ctx, options);
+    println!("Dump2 of sass_file_context_print");
+    sass_file_context_print(ctx);
+
 //    sass_compile_file_context(ctx);
 //
 //    ret = output(

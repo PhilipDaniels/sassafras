@@ -18,7 +18,7 @@ impl Default for SassInputStyle {
 }
 
 // base for all contexts
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct SassContext {
     pub options: SassOptions,
     // store context type info

@@ -2,7 +2,6 @@ use std::path::PathBuf;
 use sass_output_options::{SassOutputStyle, SassOutputOptions};
 use std::os::raw::c_char;
 use c_api_helpers::*;
-use std::ffi::OsStr;
 
 // sass config options structure
 #[derive(Default, Debug)]
@@ -111,7 +110,7 @@ impl SassOptions {
 // For debugging, to show that something is actually dropped.
 impl Drop for SassOptions {
     fn drop(&mut self) {
-        println!("Dropping Sass_Options `{:#?}`", self);
+        //println!("Dropping Sass_Options `{:#?}`", self);
     }
 }
 
@@ -129,7 +128,7 @@ pub fn sass_option_print(options_ptr: *mut SassOptions) {
 //// FROM: src/sass_context.cpp.
 #[no_mangle]
 pub extern fn sass_make_options() -> *mut SassOptions {
-    let mut options = SassOptions::new();
+    let options = SassOptions::new();
     box_to_raw_ptr(options)
 }
 
@@ -210,9 +209,7 @@ pub extern fn sass_option_set_source_map_file(options_ptr: *mut SassOptions, sou
 //ADDAPI bool ADDCALL sass_option_get_source_map_embed (struct Sass_Options* options);
 //ADDAPI bool ADDCALL sass_option_get_source_map_contents (struct Sass_Options* options);
 #[no_mangle]
-pub extern fn sass_option_get_source_map_file_urls(options_ptr: *mut SassOptions)
-{
-
+pub extern fn sass_option_get_source_map_file_urls(_options_ptr: *mut SassOptions) {
 }
 
 //ADDAPI bool ADDCALL sass_option_get_omit_source_map_url (struct Sass_Options* options);
@@ -239,7 +236,13 @@ pub extern fn sass_option_get_source_map_file(options_ptr: *mut SassOptions) -> 
 //ADDAPI void ADDCALL sass_option_set_source_map_file_urls (struct Sass_Options* options, bool source_map_file_urls);
 //ADDAPI void ADDCALL sass_option_set_indent (struct Sass_Options* options, const char* indent);
 //ADDAPI void ADDCALL sass_option_set_linefeed (struct Sass_Options* options, const char* linefeed);
-//ADDAPI void ADDCALL sass_option_set_input_path (struct Sass_Options* options, const char* input_path);
+
+#[no_mangle]
+pub extern fn sass_option_set_input_path (options_ptr: *mut SassOptions, input_path: *const c_char) {
+    let options = ptr_to_ref(options_ptr);
+    let pb = c_char_ptr_to_pathbuf(input_path);
+    options.input_path = pb;
+}
 
 #[no_mangle]
 pub extern fn sass_option_set_output_path (options_ptr: *mut SassOptions, output_path: *const c_char) {
