@@ -18,6 +18,7 @@ use std::path::Path;
 use std::path::PathBuf;
 use structopt::StructOpt;
 use sassafras::sass_file_context::*;
+use sassafras::c_api_helpers::ptr_print;
 
 // TODO: Both of these enums cause a warning to be emitted.
 
@@ -233,7 +234,6 @@ fn c_inner_main() {
 }
 
 fn c_compile_file(options: *mut SassOptions, input_file: Option<PathBuf>, output_file: Option<PathBuf>) -> i32 {
-//    int ret;
     let input_path = path_to_cstring(&input_file.unwrap());
     let ctx = sass_make_file_context(input_path.as_ptr());
     let ctx_out = sass_file_context_get_context(ctx);
@@ -242,14 +242,18 @@ fn c_compile_file(options: *mut SassOptions, input_file: Option<PathBuf>, output
         sass_option_set_output_path(options, cstring.as_ptr());
     }
 
+    ptr_print("The options>>", options);
+
     let srcmap_file = sass_option_get_source_map_file(options);
     sass_option_set_input_path(options, input_path.as_ptr());
-    sass_file_context_print("before sass_file_context_set_options>>\n", ctx);
+    ptr_print("before sass_file_context_set_options>>\n", ctx);
     sass_file_context_set_options(ctx, options);
-    sass_file_context_print("after sass_file_context_set_options>>\n", ctx);
+    ptr_print("after sass_file_context_set_options>>\n", ctx);
+
 
 //    sass_compile_file_context(ctx);
 //
+//    int ret;
 //    ret = output(
 //        sass_context_get_error_status(ctx_out),
 //        sass_context_get_error_message(ctx_out),

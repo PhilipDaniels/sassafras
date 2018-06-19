@@ -114,12 +114,6 @@ impl Drop for SassOptions {
     }
 }
 
-#[no_mangle]
-pub fn sass_options_print(msg: &str, ctx: *mut SassOptions) {
-    let context = ptr_to_ref(ctx);
-    println!("{}{:#?}", msg, context);
-}
-
 // ---------------------------------------------------------------------------------
 
 //// FROM: src/sass_context.cpp.

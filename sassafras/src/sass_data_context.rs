@@ -10,12 +10,6 @@ pub struct SassDataContext {
     srcmap_string: String,
 }
 
-#[no_mangle]
-pub fn sass_data_context_print(msg: &str, ctx: *mut SassDataContext) {
-    let context = ptr_to_ref(ctx);
-    println!("{}{:#?}", msg, context);
-}
-
 //ADDAPI struct Sass_Options* ADDCALL sass_data_context_get_options (struct Sass_Data_Context* data_ctx);
 //ADDAPI void ADDCALL sass_data_context_set_options (struct Sass_Data_Context* data_ctx, struct Sass_Options* opt);
 

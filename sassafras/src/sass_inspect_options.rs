@@ -18,9 +18,3 @@ impl SassInspectOptions {
         SassInspectOptions { output_style: style, precision }
     }
 }
-
-#[no_mangle]
-pub fn sass_inspect_options_print(msg: &str, ctx: *mut SassInspectOptions) {
-    let context = ptr_to_ref(ctx);
-    println!("{}{:#?}", msg, context);
-}

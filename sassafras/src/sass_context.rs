@@ -45,13 +45,6 @@ pub struct SassContext {
     pub included_files: Vec<PathBuf>,
 }
 
-#[no_mangle]
-pub fn sass_context_print(msg: &str, ctx: *mut SassContext) {
-    let context = ptr_to_ref(ctx);
-    println!("{}{:#?}", msg, context);
-}
-
-
 //// Getters for Sass_Context values
 //ADDAPI const char* ADDCALL sass_context_get_output_string (struct Sass_Context* ctx);
 //ADDAPI int ADDCALL sass_context_get_error_status (struct Sass_Context* ctx);

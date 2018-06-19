@@ -16,6 +16,13 @@ pub fn ptr_to<T>(ptr: *mut T) -> T {
     unsafe { *Box::from_raw(ptr) }
 }
 
+/// Converts a pointer to a Rust reference and then dumps the referent
+/// using the println! macro. Handy for debugging.
+pub fn ptr_print<T: ::std::fmt::Debug>(msg: &str, ptr: *mut T) {
+    let reference = ptr_to_ref(ptr);
+    println!("{}{:#?}", msg, reference);
+}
+
 /// Takes ownership of a Rust value, moves it onto the heap,
 /// then returns a raw pointer to the heap value. Does not
 /// drop the value at any point. It is caller responsibility

@@ -24,12 +24,6 @@ pub struct SassCompiler {
     //root: Block_Obj
 }
 
-#[no_mangle]
-pub fn sass_compiler_print(msg: &str, ctx: *mut SassCompiler) {
-    let context = ptr_to_ref(ctx);
-    println!("{}{:#?}", msg, context);
-}
-
 //
 //// Resolve a file relative to last import or include paths in the sass option struct
 //// find_file looks for the exact file name while find_include does a regular sass include
