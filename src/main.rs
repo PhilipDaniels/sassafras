@@ -229,7 +229,6 @@ fn c_inner_main() {
         result = c_compile_stdin(options, args.output_file);
     }
 
-    //sass_option_print(options);
     sass_delete_options(options);
 }
 
@@ -250,9 +249,8 @@ fn c_compile_file(options: *mut SassOptions, input_file: Option<PathBuf>, output
     sass_file_context_set_options(ctx, options);
     ptr_print("after sass_file_context_set_options>>\n", ctx);
 
+    sass_compile_file_context(ctx);
 
-//    sass_compile_file_context(ctx);
-//
 //    int ret;
 //    ret = output(
 //        sass_context_get_error_status(ctx_out),
@@ -270,7 +268,7 @@ fn c_compile_file(options: *mut SassOptions, input_file: Option<PathBuf>, output
 //        );
 //    }
 //
-//    sass_delete_file_context(ctx);
+    sass_delete_file_context(ctx);
 //    return ret;
     0
 }

@@ -71,4 +71,5 @@ pub struct SassContext {
 //ADDAPI char** ADDCALL sass_context_take_included_files (struct Sass_Context* ctx);
 
 //// Getters for Context_Options from Sass_Context
-//ADDAPI struct Sass_Options* ADDCALL sass_context_get_options (struct Sass_Context* ctx);
+//ADDAPI struct Sass_Options* ADDCALL sass_context_get_options (struct Sass_Context* ctx)
+//{ return ctx; }
