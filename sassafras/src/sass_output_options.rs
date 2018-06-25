@@ -2,7 +2,7 @@ use sass_inspect_options::SassInspectOptions;
 use c_api_helpers::ptr_to_ref;
 
 // Different render styles
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 #[repr(C)]
 pub enum SassOutputStyle {
     Nested,

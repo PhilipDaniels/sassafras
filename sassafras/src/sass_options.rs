@@ -192,23 +192,81 @@ pub extern fn sass_option_set_source_map_file(options_ptr: *mut SassOptions, sou
     options.source_map_file = pb;
 }
 
-
-//// Getters for Context_Option values
-//ADDAPI int ADDCALL sass_option_get_precision (struct Sass_Options* options);
-//ADDAPI enum Sass_Output_Style ADDCALL sass_option_get_output_style (struct Sass_Options* options);
-//ADDAPI bool ADDCALL sass_option_get_source_comments (struct Sass_Options* options);
-//ADDAPI bool ADDCALL sass_option_get_source_map_embed (struct Sass_Options* options);
-//ADDAPI bool ADDCALL sass_option_get_source_map_contents (struct Sass_Options* options);
 #[no_mangle]
-pub extern fn sass_option_get_source_map_file_urls(_options_ptr: *mut SassOptions) {
+pub extern fn sass_option_get_precision(options_ptr: *mut SassOptions) -> u8 {
+    let options = ptr_to_ref(options_ptr);
+    options.output_options.inspect_options.precision
 }
 
-//ADDAPI bool ADDCALL sass_option_get_omit_source_map_url (struct Sass_Options* options);
-//ADDAPI bool ADDCALL sass_option_get_is_indented_syntax_src (struct Sass_Options* options);
-//ADDAPI const char* ADDCALL sass_option_get_indent (struct Sass_Options* options);
-//ADDAPI const char* ADDCALL sass_option_get_linefeed (struct Sass_Options* options);
-//ADDAPI const char* ADDCALL sass_option_get_input_path (struct Sass_Options* options);
-//ADDAPI const char* ADDCALL sass_option_get_output_path (struct Sass_Options* options);
+#[no_mangle]
+pub extern fn sass_option_get_output_style(options_ptr: *mut SassOptions) -> SassOutputStyle {
+    let options = ptr_to_ref(options_ptr);
+    options.output_options.inspect_options.output_style
+}
+
+#[no_mangle]
+pub extern fn sass_option_get_source_comments(options_ptr: *mut SassOptions) -> bool {
+    let options = ptr_to_ref(options_ptr);
+    options.output_options.source_comments
+}
+
+#[no_mangle]
+pub extern fn sass_option_get_source_map_embed(options_ptr: *mut SassOptions) -> bool {
+    let options = ptr_to_ref(options_ptr);
+    options.source_map_embed
+}
+
+#[no_mangle]
+pub extern fn sass_option_get_source_map_contents(options_ptr: *mut SassOptions) -> bool {
+    let options = ptr_to_ref(options_ptr);
+    options.source_map_contents
+}
+
+#[no_mangle]
+pub extern fn sass_option_get_source_map_file_urls(options_ptr: *mut SassOptions) {
+}
+
+#[no_mangle]
+pub extern fn sass_option_get_omit_source_map_url(options_ptr: *mut SassOptions) -> bool {
+    let options = ptr_to_ref(options_ptr);
+    options.omit_source_map_url
+}
+
+#[no_mangle]
+pub extern fn sass_option_get_is_indented_syntax_src(options_ptr: *mut SassOptions) -> bool {
+    let options = ptr_to_ref(options_ptr);
+    options.is_indented_syntax_src
+}
+
+#[no_mangle]
+pub extern fn sass_option_get_indent(options_ptr: *mut SassOptions) -> bool {
+    //ADDAPI const char* ADDCALL sass_option_get_indent (struct Sass_Options* options);
+    let options = ptr_to_ref(options_ptr);
+    true
+}
+
+#[no_mangle]
+pub extern fn sass_option_get_linefeed(options_ptr: *mut SassOptions) -> bool {
+    //ADDAPI const char* ADDCALL sass_option_get_linefeed (struct Sass_Options* options);
+    let options = ptr_to_ref(options_ptr);
+    true
+}
+
+#[no_mangle]
+pub extern fn sass_option_get_input_path(options_ptr: *mut SassOptions) -> bool {
+    //ADDAPI const char* ADDCALL sass_option_get_input_path (struct Sass_Options* options);
+    let options = ptr_to_ref(options_ptr);
+    true
+}
+
+#[no_mangle]
+pub extern fn sass_option_get_output_path(options_ptr: *mut SassOptions) -> bool {
+    //ADDAPI const char* ADDCALL sass_option_get_output_path (struct Sass_Options* options);
+    let options = ptr_to_ref(options_ptr);
+    true
+}
+
+#[no_mangle]
 pub extern fn sass_option_get_source_map_file(options_ptr: *mut SassOptions) -> *const c_char {
     let options = ptr_to_ref(options_ptr);
     //let smf_path_buf = &options.source_map_file;
@@ -222,17 +280,77 @@ pub extern fn sass_option_get_source_map_file(options_ptr: *mut SassOptions) -> 
 //ADDAPI Sass_Importer_List ADDCALL sass_option_get_c_importers (struct Sass_Options* options);
 //ADDAPI Sass_Function_List ADDCALL sass_option_get_c_functions (struct Sass_Options* options);
 
-//// Setters for Context_Option values
-//ADDAPI void ADDCALL sass_option_set_source_map_contents (struct Sass_Options* options, bool source_map_contents);
-//ADDAPI void ADDCALL sass_option_set_source_map_file_urls (struct Sass_Options* options, bool source_map_file_urls);
-//ADDAPI void ADDCALL sass_option_set_indent (struct Sass_Options* options, const char* indent);
-//ADDAPI void ADDCALL sass_option_set_linefeed (struct Sass_Options* options, const char* linefeed);
+#[no_mangle]
+pub extern fn sass_option_set_source_map_contents(options_ptr: *mut SassOptions, source_map_contents: bool) {
+    let options = ptr_to_ref(options_ptr);
+    options.source_map_contents = source_map_contents;
+}
 
 #[no_mangle]
-pub extern fn sass_option_set_input_path (options_ptr: *mut SassOptions, input_path: *const c_char) {
+pub extern fn sass_option_set_source_map_file_urls(options_ptr: *mut SassOptions, source_map_file_urls: bool) {
+    let options = ptr_to_ref(options_ptr);
+    options.source_map_file_urls = source_map_file_urls;
+}
+
+#[no_mangle]
+pub extern fn sass_option_set_indent(options_ptr: *mut SassOptions, indent: *const c_char) {
+    let options = ptr_to_ref(options_ptr);
+    //options.source_map_file_urls = source_map_file_urls;
+}
+
+#[no_mangle]
+pub extern fn sass_option_set_linefeed(options_ptr: *mut SassOptions, linefeed: *const c_char) {
+    let options = ptr_to_ref(options_ptr);
+    //options.source_map_file_urls = source_map_file_urls;
+}
+
+#[no_mangle]
+pub extern fn sass_option_set_input_path(options_ptr: *mut SassOptions, input_path: *const c_char) {
     let options = ptr_to_ref(options_ptr);
     let pb = c_char_ptr_to_pathbuf(input_path);
     options.input_path = pb;
+}
+
+#[no_mangle]
+pub extern fn sass_option_set_plugin_path(options_ptr: *mut SassOptions, plugin_path: *const c_char) {
+    let options = ptr_to_ref(options_ptr);
+    let pb = c_char_ptr_to_pathbuf(plugin_path);
+    options.output_path = pb;
+}
+
+#[no_mangle]
+pub extern fn sass_option_set_include_path(options_ptr: *mut SassOptions, include_path: *const c_char) {
+    let options = ptr_to_ref(options_ptr);
+    let pb = c_char_ptr_to_pathbuf(include_path);
+    options.output_path = pb;
+}
+
+#[no_mangle]
+pub extern fn sass_option_set_source_map_root(options_ptr: *mut SassOptions, source_map_root: *const c_char) {
+    let options = ptr_to_ref(options_ptr);
+    let pb = c_char_ptr_to_pathbuf(source_map_root);
+    options.output_path = pb;
+}
+
+#[no_mangle]
+pub extern fn sass_option_set_c_headers(options_ptr: *mut SassOptions, c_headers: *const c_char) {
+    // c_headers: SassImporterList (yes this is right)
+    let options = ptr_to_ref(options_ptr);
+}
+
+#[no_mangle]
+pub extern fn sass_option_set_c_importers(options_ptr: *mut SassOptions, c_importers: *const c_char) {
+    // c_importers: SassImporterList
+    let options = ptr_to_ref(options_ptr);
+//    let pb = c_char_ptr_to_pathbuf(output_path);
+//    options.output_path = pb;
+}
+
+#[no_mangle]
+pub extern fn sass_option_set_c_functions(options_ptr: *mut SassOptions, c_functions: *const c_char) {
+    let options = ptr_to_ref(options_ptr);
+//    let pb = c_char_ptr_to_pathbuf(output_path);
+//    options.output_path = pb;
 }
 
 #[no_mangle]
@@ -241,13 +359,6 @@ pub extern fn sass_option_set_output_path (options_ptr: *mut SassOptions, output
     let pb = c_char_ptr_to_pathbuf(output_path);
     options.output_path = pb;
 }
-
-//ADDAPI void ADDCALL sass_option_set_plugin_path (struct Sass_Options* options, const char* plugin_path);
-//ADDAPI void ADDCALL sass_option_set_include_path (struct Sass_Options* options, const char* include_path);
-//ADDAPI void ADDCALL sass_option_set_source_map_root (struct Sass_Options* options, const char* source_map_root);
-//ADDAPI void ADDCALL sass_option_set_c_headers (struct Sass_Options* options, Sass_Importer_List c_headers);
-//ADDAPI void ADDCALL sass_option_set_c_importers (struct Sass_Options* options, Sass_Importer_List c_importers);
-//ADDAPI void ADDCALL sass_option_set_c_functions (struct Sass_Options* options, Sass_Function_List c_functions);
 
 #[no_mangle]
 pub extern fn sass_option_get_include_path_size(options_ptr: *mut SassOptions) -> usize {

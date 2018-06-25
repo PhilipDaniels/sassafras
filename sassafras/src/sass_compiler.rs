@@ -1,8 +1,9 @@
 use sass_context::SassContext;
 use c_api_helpers::ptr_to_ref;
+use sass_options::SassOptions;
 
 // Compiler states
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 #[repr(C)]
 pub enum SassCompilerState {
     Created,
@@ -30,16 +31,69 @@ pub struct SassCompiler {
 //ADDAPI char* ADDCALL sass_compiler_find_file (const char* path, struct Sass_Compiler* compiler);
 //ADDAPI char* ADDCALL sass_compiler_find_include (const char* path, struct Sass_Compiler* compiler);
 
-//// Getters for Sass_Compiler options
-//ADDAPI enum Sass_Compiler_State ADDCALL sass_compiler_get_state(struct Sass_Compiler* compiler);
-//ADDAPI struct Sass_Context* ADDCALL sass_compiler_get_context(struct Sass_Compiler* compiler);
-//ADDAPI struct Sass_Options* ADDCALL sass_compiler_get_options(struct Sass_Compiler* compiler);
-//ADDAPI size_t ADDCALL sass_compiler_get_import_stack_size(struct Sass_Compiler* compiler);
-//ADDAPI Sass_Import_Entry ADDCALL sass_compiler_get_last_import(struct Sass_Compiler* compiler);
-//ADDAPI Sass_Import_Entry ADDCALL sass_compiler_get_import_entry(struct Sass_Compiler* compiler, size_t idx);
-//ADDAPI size_t ADDCALL sass_compiler_get_callee_stack_size(struct Sass_Compiler* compiler);
-//ADDAPI Sass_Callee_Entry ADDCALL sass_compiler_get_last_callee(struct Sass_Compiler* compiler);
-//ADDAPI Sass_Callee_Entry ADDCALL sass_compiler_get_callee_entry(struct Sass_Compiler* compiler, size_t idx);
+#[no_mangle]
+pub extern fn sass_compiler_get_state(compiler: *mut SassCompiler) -> SassCompilerState {
+    let compiler = ptr_to_ref(compiler);
+    compiler.state
+}
+
+#[no_mangle]
+pub extern fn sass_compiler_get_context(compiler: *mut SassCompiler) -> *mut SassContext {
+    let compiler = ptr_to_ref(compiler);
+    &mut compiler.c_ctx
+}
+
+#[no_mangle]
+pub extern fn sass_compiler_get_options(compiler: *mut SassCompiler) -> *mut SassOptions {
+    let compiler = ptr_to_ref(compiler);
+    &mut compiler.c_ctx.options
+}
+
+#[no_mangle]
+pub extern fn sass_compiler_get_stack_size(compiler: *mut SassCompiler) -> usize {
+    let compiler = ptr_to_ref(compiler);
+    //compiler.cpp_ctx..import_stack.size()
+    0
+}
+
+#[no_mangle]
+pub extern fn sass_compiler_get_last_import(compiler: *mut SassCompiler) -> usize {
+    let compiler = ptr_to_ref(compiler);
+    //compiler.cpp_ctx.import_stack.back() // the last element, should be a SassImportEntry,
+    // which is not defined yet. It is a function pointer.
+    // SassImportEntry
+    0
+}
+
+#[no_mangle]
+pub extern fn sass_compiler_get_import_entry(compiler: *mut SassCompiler) -> usize {
+    let compiler = ptr_to_ref(compiler);
+    // return compiler->cpp_ctx->import_stack[idx]; // SassImportEntry
+    0
+}
+
+#[no_mangle]
+pub extern fn sass_compiler_get_callee_stack_size(compiler: *mut SassCompiler) -> usize {
+    let compiler = ptr_to_ref(compiler);
+    // return compiler->cpp_ctx->callee_stack.size();
+    0
+}
+
+#[no_mangle]
+pub extern fn sass_compiler_get_last_callee(compiler: *mut SassCompiler) -> usize {
+    // should return a SassCalleeEntry
+    let compiler = ptr_to_ref(compiler);
+    // return &compiler->cpp_ctx->callee_stack.back();
+    0
+}
+
+#[no_mangle]
+pub extern fn sass_compiler_get_callee_entry(compiler: *mut SassCompiler, idx: usize) -> usize {
+    // should return a SassCalleeEntry
+    let compiler = ptr_to_ref(compiler);
+    // return &compiler->cpp_ctx->callee_stack[idx];
+    0
+}
 
 /*
 //// Execute the different compilation steps individually

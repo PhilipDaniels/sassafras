@@ -82,10 +82,11 @@ pub extern fn sass_file_context_get_context(file_ctx: *mut SassFileContext) -> *
     &mut ctx.context
 }
 
-//ADDAPI struct Sass_Options* ADDCALL sass_file_context_get_options(struct Sass_File_Context* file_ctx)
-//{
-    //return ctx;
-//}
+#[no_mangle]
+pub extern fn sass_file_context_get_options(file_ctx: *mut SassFileContext) -> *mut SassOptions {
+    let ctx = ptr_to_ref(file_ctx);
+    &mut ctx.context.options
+}
 
 #[no_mangle]
 pub extern fn sass_file_context_set_options(file_ctx: *mut SassFileContext, options: *mut SassOptions) {

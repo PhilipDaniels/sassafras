@@ -95,6 +95,7 @@ struct Arguments {
 }
 
 // Example usage: cargo run -- -m=auto -p=6 -t=Compact INFILE.sass OUTFILE.css
+
 fn main() {
     c_inner_main();
     //rust_inner_main();

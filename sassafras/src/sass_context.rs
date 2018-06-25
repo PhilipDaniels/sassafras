@@ -60,7 +60,7 @@ pub struct SassContext {
 
 //// Calculate the size of the stored null terminated array
 //ADDAPI size_t ADDCALL sass_context_get_included_files_size (struct Sass_Context* ctx);
-//
+
 //// Take ownership of memory (value on context is set to 0)
 //ADDAPI char* ADDCALL sass_context_take_error_json (struct Sass_Context* ctx);
 //ADDAPI char* ADDCALL sass_context_take_error_text (struct Sass_Context* ctx);
@@ -70,6 +70,8 @@ pub struct SassContext {
 //ADDAPI char* ADDCALL sass_context_take_source_map_string (struct Sass_Context* ctx);
 //ADDAPI char** ADDCALL sass_context_take_included_files (struct Sass_Context* ctx);
 
-//// Getters for Context_Options from Sass_Context
-//ADDAPI struct Sass_Options* ADDCALL sass_context_get_options (struct Sass_Context* ctx)
-//{ return ctx; }
+#[no_mangle]
+pub extern fn sass_context_get_options(file_ctx: *mut SassContext) -> *mut SassOptions {
+    let ctx = ptr_to_ref(file_ctx);
+    &mut ctx.options
+}

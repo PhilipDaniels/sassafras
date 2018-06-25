@@ -48,3 +48,28 @@ Data_Context : Context
 The way I am allocating and dropping structs using Box() is correct according to
 https://www.reddit.com/r/rust/comments/3r5icb/exposing_rust_struct_to_python/
 
+
+
+IMPLEMENT_SASS_OPTION_ACCESSOR
+  creates 2 functions, a getter and a setter that just return/set the thing
+
+IMPLEMENT_SASS_OPTION_STRING_GETTER
+  creates 1 function, that returns the member if not null, else the default
+
+IMPLEMENT_SASS_OPTION_STRING_SETTER
+  creates 1 function, that a) frees the original string
+                           b) calls sass_copy_c_string on the param or default, or sets to 0-null.
+                           c) assigns to the field
+
+  Therefore API methods that use this take copies of the passed pointers
+
+IMPLEMENT_SASS_OPTION_STRING_ACCESSOR
+  creates 2 functions, using IMPLEMENT_SASS_OPTION_STRING_GETTER and IMPLEMENT_SASS_OPTION_STRING_SETTER
+
+IMPLEMENT_SASS_CONTEXT_GETTER
+  creates 1 function that returns ctx->option
+
+IMPLEMENT_SASS_CONTEXT_TAKER
+  creates 1 function takes a copy of ctx->option, sets ctx->option to 0, then returns the copy
+  Therefore this function releases ownership of the memory and returns it to the caller
+
